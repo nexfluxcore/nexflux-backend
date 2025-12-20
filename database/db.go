@@ -1,0 +1,189 @@
+package database
+
+import (
+	"fmt"
+	"log"
+	"nexfi-backend/models"
+	"os"
+
+	"github.com/joho/godotenv"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+)
+
+var DB *gorm.DB
+
+func InitDB() {
+	// Load .env file
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found, using environment variables")
+	}
+
+	// Construct DSN from environment variables
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_NAME"),
+		os.Getenv("DB_PORT"),
+	)
+
+	config := &gorm.Config{}
+
+	// Enable GORM debug mode if DB_DEBUG is true
+	if os.Getenv("DB_DEBUG") == "true" {
+		config.Logger = logger.Default.LogMode(logger.Info)
+	}
+
+	var err error
+	DB, err = gorm.Open(postgres.Open(dsn), config)
+	if err != nil {
+		panic("Failed to connect to database: " + err.Error())
+	}
+
+	log.Println("✅ Database connected successfully")
+
+	// Setup database extensions
+	setupExtensions()
+
+	// Auto migrate models if DB_AUTO_MIGRATE is true
+	if os.Getenv("DB_AUTO_MIGRATE") == "true" {
+		RunMigrations()
+	}
+}
+
+// setupExtensions ensures required PostgreSQL extensions are enabled
+func setupExtensions() {
+	var hasUUID bool
+	err := DB.Raw("SELECT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'uuid-ossp')").Scan(&hasUUID).Error
+	if err != nil {
+		panic("Failed to check uuid-ossp extension: " + err.Error())
+	}
+
+	if !hasUUID {
+		log.Println("⚠️ WARNING: uuid-ossp extension is not installed.")
+		log.Println("Run: CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";")
+		panic("Database needs uuid-ossp extension to be installed by a superuser")
+	}
+}
+
+// RunMigrations runs all database migrations in order
+func RunMigrations() {
+	log.Println("🔄 Running database migrations...")
+
+	// Migration order is important due to foreign key relationships
+	migrations := []struct {
+		Name   string
+		Models []interface{}
+	}{
+		{
+			Name: "Users Module",
+			Models: []interface{}{
+				&models.User{},
+				&models.UserSettings{},
+				&models.UserSession{},
+				&models.UserStreak{},
+			},
+		},
+		{
+			Name: "Components Module",
+			Models: []interface{}{
+				&models.ComponentCategory{},
+				&models.Component{},
+				&models.ComponentRequest{},
+				&models.UserFavoriteComponent{},
+			},
+		},
+		{
+			Name: "Projects Module",
+			Models: []interface{}{
+				&models.Project{},
+				&models.ProjectCollaborator{},
+				&models.ProjectComponent{},
+			},
+		},
+		{
+			Name: "Challenges Module",
+			Models: []interface{}{
+				&models.Challenge{},
+				&models.ChallengeProgress{},
+				&models.DailyChallenge{},
+			},
+		},
+		{
+			Name: "Notifications Module",
+			Models: []interface{}{
+				&models.Notification{},
+			},
+		},
+		{
+			Name: "Gamification Module",
+			Models: []interface{}{
+				&models.Achievement{},
+				&models.UserAchievement{},
+				&models.Leaderboard{},
+				&models.LeaderboardEntry{},
+			},
+		},
+	}
+
+	for _, migration := range migrations {
+		log.Printf("  → Migrating %s...", migration.Name)
+		if err := DB.AutoMigrate(migration.Models...); err != nil {
+			panic(fmt.Sprintf("Failed to migrate %s: %v", migration.Name, err))
+		}
+	}
+
+	// Create indexes after migration
+	createIndexes()
+
+	log.Println("✅ Database migrations completed")
+}
+
+// createIndexes creates additional indexes for performance
+func createIndexes() {
+	log.Println("  → Creating indexes...")
+
+	indexes := []string{
+		// User indexes
+		"CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)",
+		"CREATE INDEX IF NOT EXISTS idx_users_username ON users(username)",
+		"CREATE INDEX IF NOT EXISTS idx_users_provider ON users(provider, provider_id)",
+
+		// Project indexes
+		"CREATE INDEX IF NOT EXISTS idx_projects_user_id ON projects(user_id)",
+		"CREATE INDEX IF NOT EXISTS idx_projects_is_public ON projects(is_public)",
+		"CREATE INDEX IF NOT EXISTS idx_projects_difficulty ON projects(difficulty)",
+
+		// Component indexes
+		"CREATE INDEX IF NOT EXISTS idx_components_category ON components(category_id)",
+		"CREATE INDEX IF NOT EXISTS idx_components_is_active ON components(is_active)",
+
+		// Challenge indexes
+		"CREATE INDEX IF NOT EXISTS idx_challenges_type ON challenges(type)",
+		"CREATE INDEX IF NOT EXISTS idx_challenges_difficulty ON challenges(difficulty)",
+		"CREATE INDEX IF NOT EXISTS idx_challenges_is_active ON challenges(is_active)",
+
+		// Challenge progress indexes
+		"CREATE INDEX IF NOT EXISTS idx_challenge_progress_user ON challenge_progress(user_id)",
+		"CREATE INDEX IF NOT EXISTS idx_challenge_progress_status ON challenge_progress(status)",
+
+		// Notification indexes
+		"CREATE INDEX IF NOT EXISTS idx_notifications_user_unread ON notifications(user_id, is_read)",
+
+		// Leaderboard indexes
+		"CREATE INDEX IF NOT EXISTS idx_leaderboard_entries_rank ON leaderboard_entries(leaderboard_id, rank)",
+	}
+
+	for _, idx := range indexes {
+		if err := DB.Exec(idx).Error; err != nil {
+			log.Printf("Warning: Failed to create index: %v", err)
+		}
+	}
+}
+
+// GetDB returns the database instance
+func GetDB() *gorm.DB {
+	return DB
+}

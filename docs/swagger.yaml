@@ -1,0 +1,2465 @@
+basePath: /api/v1
+definitions:
+  dto.AchievementListResponse:
+    properties:
+      achievements:
+        items:
+          $ref: '#/definitions/dto.AchievementResponse'
+        type: array
+      stats:
+        properties:
+          total:
+            type: integer
+          unlocked:
+            type: integer
+        type: object
+    type: object
+  dto.AchievementResponse:
+    properties:
+      description:
+        type: string
+      icon:
+        type: string
+      id:
+        type: string
+      is_unlocked:
+        type: boolean
+      name:
+        type: string
+      progress:
+        type: integer
+      rarity:
+        type: string
+      requirement_type:
+        type: string
+      requirement_value:
+        type: integer
+      unlocked_at:
+        type: string
+      xp_reward:
+        type: integer
+    type: object
+  dto.AchievementStats:
+    properties:
+      total:
+        type: integer
+      unlocked:
+        type: integer
+    type: object
+  dto.AuthResponse:
+    properties:
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/dto.UserAuthInfo'
+    type: object
+  dto.CategoryResponse:
+    properties:
+      color:
+        type: string
+      component_count:
+        type: integer
+      description:
+        type: string
+      icon:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      order:
+        type: integer
+      slug:
+        type: string
+    type: object
+  dto.ChallengeDetailResponse:
+    properties:
+      category:
+        type: string
+      description:
+        type: string
+      difficulty:
+        type: string
+      ends_at:
+        type: string
+      id:
+        type: string
+      instructions:
+        items:
+          type: integer
+        type: array
+      is_active:
+        type: boolean
+      max_participants:
+        type: integer
+      participant_count:
+        type: integer
+      prerequisites:
+        items:
+          type: string
+        type: array
+      starts_at:
+        type: string
+      time_left_hours:
+        type: number
+      time_limit_hours:
+        type: integer
+      title:
+        type: string
+      type:
+        type: string
+      user_progress:
+        type: integer
+      user_status:
+        description: not_started, in_progress, completed, failed
+        type: string
+      validation_criteria:
+        items:
+          type: integer
+        type: array
+      xp_reward:
+        type: integer
+    type: object
+  dto.ChallengeListResponse:
+    properties:
+      challenges:
+        items:
+          $ref: '#/definitions/dto.ChallengeResponse'
+        type: array
+      stats:
+        $ref: '#/definitions/dto.ChallengeStats'
+    type: object
+  dto.ChallengeProgressResponse:
+    properties:
+      challenge:
+        $ref: '#/definitions/dto.ChallengeResponse'
+      challenge_id:
+        type: string
+      completed_at:
+        type: string
+      current_step:
+        type: integer
+      id:
+        type: string
+      progress:
+        type: integer
+      started_at:
+        type: string
+      status:
+        type: string
+      time_spent_minutes:
+        type: integer
+      xp_earned:
+        type: integer
+    type: object
+  dto.ChallengeResponse:
+    properties:
+      category:
+        type: string
+      description:
+        type: string
+      difficulty:
+        type: string
+      ends_at:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      max_participants:
+        type: integer
+      participant_count:
+        type: integer
+      starts_at:
+        type: string
+      time_left_hours:
+        type: number
+      time_limit_hours:
+        type: integer
+      title:
+        type: string
+      type:
+        type: string
+      user_progress:
+        type: integer
+      user_status:
+        description: not_started, in_progress, completed, failed
+        type: string
+      xp_reward:
+        type: integer
+    type: object
+  dto.ChallengeStats:
+    properties:
+      completed:
+        type: integer
+      in_progress:
+        type: integer
+      total_available:
+        type: integer
+    type: object
+  dto.CollaboratorResponse:
+    properties:
+      accepted_at:
+        type: string
+      id:
+        type: string
+      invited_at:
+        type: string
+      role:
+        type: string
+      user:
+        $ref: '#/definitions/dto.UserResponse'
+      user_id:
+        type: string
+    type: object
+  dto.ComponentRequestCreateRequest:
+    properties:
+      category:
+        type: string
+      component_name:
+        maxLength: 200
+        type: string
+      datasheet_url:
+        type: string
+      description:
+        type: string
+      features:
+        items:
+          type: string
+        type: array
+      manufacturer:
+        type: string
+      part_number:
+        type: string
+      priority:
+        enum:
+        - low
+        - medium
+        - high
+        - urgent
+        type: string
+      product_url:
+        type: string
+      use_case:
+        type: string
+    required:
+    - category
+    - component_name
+    - description
+    - use_case
+    type: object
+  dto.ComponentRequestResponse:
+    properties:
+      admin_notes:
+        type: string
+      category:
+        type: string
+      component_name:
+        type: string
+      created_at:
+        type: string
+      datasheet_url:
+        type: string
+      description:
+        type: string
+      features:
+        items:
+          type: string
+        type: array
+      id:
+        type: string
+      manufacturer:
+        type: string
+      part_number:
+        type: string
+      priority:
+        type: string
+      product_url:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+      use_case:
+        type: string
+      user_id:
+        type: string
+    type: object
+  dto.ComponentResponse:
+    properties:
+      category:
+        $ref: '#/definitions/dto.CategoryResponse'
+      category_id:
+        type: string
+      datasheet_url:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      image_url:
+        type: string
+      is_active:
+        type: boolean
+      is_favorite:
+        type: boolean
+      manufacturer:
+        type: string
+      name:
+        type: string
+      part_number:
+        type: string
+      price:
+        type: number
+      rating:
+        type: number
+      rating_count:
+        type: integer
+      simulation_model:
+        type: string
+      specs:
+        items:
+          type: integer
+        type: array
+      stock:
+        type: integer
+    type: object
+  dto.DailyChallengeResponse:
+    properties:
+      challenge:
+        $ref: '#/definitions/dto.ChallengeResponse'
+      date:
+        type: string
+      id:
+        type: string
+      participant_count:
+        type: integer
+      time_left_hours:
+        type: number
+      user_status:
+        type: string
+      xp_multiplier:
+        type: number
+    type: object
+  dto.LeaderboardEntryResponse:
+    properties:
+      is_current_user:
+        type: boolean
+      rank:
+        type: integer
+      user:
+        $ref: '#/definitions/dto.UserBriefResponse'
+      xp:
+        type: integer
+    type: object
+  dto.LeaderboardResponse:
+    properties:
+      current_user_rank:
+        type: integer
+      entries:
+        items:
+          $ref: '#/definitions/dto.LeaderboardEntryResponse'
+        type: array
+      period:
+        $ref: '#/definitions/dto.PeriodResponse'
+      type:
+        type: string
+    type: object
+  dto.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  dto.NotificationListResponse:
+    properties:
+      notifications:
+        items:
+          $ref: '#/definitions/dto.NotificationResponse'
+        type: array
+      pagination:
+        $ref: '#/definitions/dto.PaginationResponse'
+      unread_count:
+        type: integer
+    type: object
+  dto.NotificationResponse:
+    properties:
+      created_at:
+        type: string
+      data:
+        items:
+          type: integer
+        type: array
+      id:
+        type: string
+      is_read:
+        type: boolean
+      message:
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+    type: object
+  dto.OAuthCallbackRequest:
+    properties:
+      code:
+        type: string
+      state:
+        type: string
+    required:
+    - code
+    type: object
+  dto.OAuthURLResponse:
+    properties:
+      state:
+        type: string
+      url:
+        type: string
+    type: object
+  dto.PaginationResponse:
+    properties:
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.PeriodResponse:
+    properties:
+      end:
+        type: string
+      start:
+        type: string
+    type: object
+  dto.ProjectComponentResponse:
+    properties:
+      component:
+        $ref: '#/definitions/dto.ComponentResponse'
+      component_id:
+        type: string
+      config_data:
+        items:
+          type: integer
+        type: array
+      id:
+        type: string
+      position_x:
+        type: number
+      position_y:
+        type: number
+      quantity:
+        type: integer
+      rotation:
+        type: number
+    type: object
+  dto.ProjectCreateRequest:
+    properties:
+      description:
+        type: string
+      difficulty:
+        enum:
+        - Beginner
+        - Intermediate
+        - Advanced
+        type: string
+      hardware_platform:
+        type: string
+      is_public:
+        type: boolean
+      is_template:
+        type: boolean
+      name:
+        maxLength: 200
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+    required:
+    - name
+    type: object
+  dto.ProjectDetailResponse:
+    properties:
+      code_data:
+        items:
+          type: integer
+        type: array
+      collaborators:
+        items:
+          $ref: '#/definitions/dto.CollaboratorResponse'
+        type: array
+      collaborators_count:
+        type: integer
+      completed_at:
+        type: string
+      components:
+        items:
+          $ref: '#/definitions/dto.ProjectComponentResponse'
+        type: array
+      components_count:
+        type: integer
+      created_at:
+        type: string
+      description:
+        type: string
+      difficulty:
+        type: string
+      hardware_platform:
+        type: string
+      id:
+        type: string
+      is_favorite:
+        type: boolean
+      is_public:
+        type: boolean
+      is_template:
+        type: boolean
+      name:
+        type: string
+      progress:
+        type: integer
+      schema_data:
+        items:
+          type: integer
+        type: array
+      simulation_data:
+        items:
+          type: integer
+        type: array
+      tags:
+        items:
+          type: string
+        type: array
+      thumbnail_url:
+        type: string
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/dto.UserResponse'
+      user_id:
+        type: string
+      xp_reward:
+        type: integer
+    type: object
+  dto.ProjectResponse:
+    properties:
+      collaborators_count:
+        type: integer
+      completed_at:
+        type: string
+      components_count:
+        type: integer
+      created_at:
+        type: string
+      description:
+        type: string
+      difficulty:
+        type: string
+      hardware_platform:
+        type: string
+      id:
+        type: string
+      is_favorite:
+        type: boolean
+      is_public:
+        type: boolean
+      is_template:
+        type: boolean
+      name:
+        type: string
+      progress:
+        type: integer
+      tags:
+        items:
+          type: string
+        type: array
+      thumbnail_url:
+        type: string
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/dto.UserResponse'
+      user_id:
+        type: string
+      xp_reward:
+        type: integer
+    type: object
+  dto.ProjectStats:
+    properties:
+      completed:
+        type: integer
+      in_progress:
+        type: integer
+      total:
+        type: integer
+    type: object
+  dto.ProjectUpdateRequest:
+    properties:
+      code_data:
+        items:
+          type: integer
+        type: array
+      description:
+        type: string
+      difficulty:
+        enum:
+        - Beginner
+        - Intermediate
+        - Advanced
+        type: string
+      hardware_platform:
+        type: string
+      is_favorite:
+        type: boolean
+      is_public:
+        type: boolean
+      name:
+        maxLength: 200
+        type: string
+      progress:
+        maximum: 100
+        minimum: 0
+        type: integer
+      schema_data:
+        items:
+          type: integer
+        type: array
+      simulation_data:
+        items:
+          type: integer
+        type: array
+      tags:
+        items:
+          type: string
+        type: array
+      thumbnail_url:
+        type: string
+    type: object
+  dto.RegisterRequest:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 6
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  dto.StreakInfo:
+    properties:
+      current:
+        type: integer
+      last_active:
+        type: string
+      longest:
+        type: integer
+    type: object
+  dto.StreakResponse:
+    properties:
+      current_streak:
+        type: integer
+      is_active_today:
+        type: boolean
+      last_activity_date:
+        type: string
+      longest_streak:
+        type: integer
+      streak_protects:
+        type: integer
+    type: object
+  dto.SubmitChallengeRequest:
+    properties:
+      notes:
+        type: string
+      submission_data:
+        items:
+          type: integer
+        type: array
+    required:
+    - submission_data
+    type: object
+  dto.SubmitChallengeResponse:
+    properties:
+      achievements_unlocked:
+        items:
+          $ref: '#/definitions/dto.AchievementResponse'
+        type: array
+      bonus_xp:
+        type: integer
+      level_up:
+        type: boolean
+      new_level:
+        type: integer
+      total_xp:
+        type: integer
+      xp_earned:
+        type: integer
+    type: object
+  dto.UpdateProgressRequest:
+    properties:
+      current_step:
+        minimum: 0
+        type: integer
+      progress:
+        maximum: 100
+        minimum: 0
+        type: integer
+      time_spent_minutes:
+        minimum: 0
+        type: integer
+    type: object
+  dto.UserAuthInfo:
+    properties:
+      avatar:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      is_verified:
+        type: boolean
+      provider:
+        type: string
+      username:
+        type: string
+    type: object
+  dto.UserBriefResponse:
+    properties:
+      avatar_url:
+        type: string
+      id:
+        type: string
+      level:
+        type: integer
+      name:
+        type: string
+      username:
+        type: string
+    type: object
+  dto.UserResponse:
+    properties:
+      avatar_url:
+        type: string
+      bio:
+        type: string
+      created_at:
+        type: string
+      current_xp:
+        type: integer
+      email:
+        type: string
+      email_verified:
+        type: boolean
+      id:
+        type: string
+      is_pro:
+        type: boolean
+      language:
+        type: string
+      level:
+        type: integer
+      name:
+        type: string
+      role:
+        type: string
+      streak_days:
+        type: integer
+      target_xp:
+        type: integer
+      theme:
+        type: string
+      total_xp:
+        type: integer
+      username:
+        type: string
+    type: object
+  dto.UserSettingsResponse:
+    properties:
+      notification_email:
+        type: boolean
+      notification_marketing:
+        type: boolean
+      notification_push:
+        type: boolean
+      notification_updates:
+        type: boolean
+    type: object
+  dto.UserSettingsUpdateRequest:
+    properties:
+      notification_email:
+        type: boolean
+      notification_marketing:
+        type: boolean
+      notification_push:
+        type: boolean
+      notification_updates:
+        type: boolean
+    type: object
+  dto.UserStatsResponse:
+    properties:
+      achievements:
+        $ref: '#/definitions/dto.AchievementStats'
+      challenges:
+        $ref: '#/definitions/dto.ChallengeStats'
+      current_xp:
+        type: integer
+      level:
+        type: integer
+      projects:
+        $ref: '#/definitions/dto.ProjectStats'
+      streak:
+        $ref: '#/definitions/dto.StreakInfo'
+      target_xp:
+        type: integer
+      total_xp:
+        type: integer
+      xp_this_week:
+        type: integer
+      xp_to_next_level:
+        type: integer
+    type: object
+  dto.UserUpdateRequest:
+    properties:
+      bio:
+        maxLength: 500
+        type: string
+      language:
+        enum:
+        - en
+        - id
+        - jp
+        type: string
+      name:
+        maxLength: 100
+        type: string
+      theme:
+        enum:
+        - light
+        - dark
+        - system
+        type: string
+      username:
+        maxLength: 50
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: idnmakerspace@gmail.com
+    name: API Support
+  description: Backend API for NexFlux Virtual Lab - An interactive electronics learning
+    platform
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: NexFlux Virtual Lab API
+  version: "1.0"
+paths:
+  /achievements:
+    get:
+      description: Get list of all achievements with user's unlock status and progress
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of achievements with stats
+          schema:
+            $ref: '#/definitions/dto.AchievementListResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get all achievements
+      tags:
+      - Gamification
+  /achievements/user:
+    get:
+      description: Get list of achievements unlocked by the current user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of unlocked achievements
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get my achievements
+      tags:
+      - Gamification
+  /auth/{provider}:
+    get:
+      description: Get the authorization URL for the specified OAuth provider
+      parameters:
+      - description: OAuth Provider (google, github, apple)
+        in: path
+        name: provider
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.OAuthURLResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "501":
+          description: Not Implemented
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get OAuth authorization URL
+      tags:
+      - Auth
+  /auth/{provider}/callback:
+    get:
+      description: Process OAuth callback and authenticate/register user
+      parameters:
+      - description: OAuth Provider (google, github, apple)
+        in: path
+        name: provider
+        required: true
+        type: string
+      - description: Authorization code from OAuth provider
+        in: query
+        name: code
+        required: true
+        type: string
+      - description: State parameter for CSRF protection
+        in: query
+        name: state
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Handle OAuth callback
+      tags:
+      - Auth
+    post:
+      consumes:
+      - application/json
+      description: Process OAuth callback via POST request (for mobile/desktop apps
+        and Apple Sign In)
+      parameters:
+      - description: OAuth Provider (google, github, apple)
+        in: path
+        name: provider
+        required: true
+        type: string
+      - description: OAuth Callback Request
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OAuthCallbackRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Handle OAuth callback via POST
+      tags:
+      - Auth
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user with email and password
+      parameters:
+      - description: Login Request
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Login with email and password
+      tags:
+      - Auth
+  /auth/providers:
+    get:
+      description: Returns list of OAuth providers that are configured and available
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                type: string
+              type: array
+            type: object
+      summary: Get list of supported OAuth providers
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with email, password, and optional username
+      parameters:
+      - description: Register Request
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Register a new user with email and password
+      tags:
+      - Auth
+  /challenges:
+    get:
+      description: Get list of available challenges with optional filters
+      parameters:
+      - default: all
+        description: Challenge type (all, daily, weekly, special, regular)
+        in: query
+        name: type
+        type: string
+      - description: Difficulty filter (Easy, Medium, Hard, Expert)
+        in: query
+        name: difficulty
+        type: string
+      - description: Category filter
+        in: query
+        name: category
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of challenges with stats
+          schema:
+            $ref: '#/definitions/dto.ChallengeListResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: List challenges
+      tags:
+      - Challenges
+  /challenges/{id}:
+    get:
+      description: Get detailed information about a specific challenge including instructions
+      parameters:
+      - description: Challenge ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Challenge details
+          schema:
+            $ref: '#/definitions/dto.ChallengeDetailResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Challenge not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get challenge details
+      tags:
+      - Challenges
+  /challenges/{id}/progress:
+    put:
+      consumes:
+      - application/json
+      description: Update user's progress on an active challenge
+      parameters:
+      - description: Challenge ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Progress data
+        in: body
+        name: progress
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateProgressRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated progress
+          schema:
+            $ref: '#/definitions/dto.ChallengeProgressResponse'
+        "400":
+          description: Invalid input or challenge not started
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Update challenge progress
+      tags:
+      - Challenges
+  /challenges/{id}/start:
+    post:
+      description: Start working on a challenge (creates progress record)
+      parameters:
+      - description: Challenge ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Challenge progress
+          schema:
+            $ref: '#/definitions/dto.ChallengeProgressResponse'
+        "400":
+          description: Challenge not available or already started
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Challenge not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Start a challenge
+      tags:
+      - Challenges
+  /challenges/{id}/submit:
+    post:
+      consumes:
+      - application/json
+      description: Submit challenge for completion and earn XP rewards
+      parameters:
+      - description: Challenge ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Submission data
+        in: body
+        name: submission
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SubmitChallengeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Completion result with XP earned
+          schema:
+            $ref: '#/definitions/dto.SubmitChallengeResponse'
+        "400":
+          description: Challenge not started or already completed
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Submit challenge completion
+      tags:
+      - Challenges
+  /challenges/daily:
+    get:
+      description: Get the daily challenge for today with bonus XP multiplier
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Daily challenge details
+          schema:
+            $ref: '#/definitions/dto.DailyChallengeResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: No daily challenge today
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get today's daily challenge
+      tags:
+      - Challenges
+  /challenges/progress:
+    get:
+      description: Get list of challenges the user has started or completed
+      parameters:
+      - description: Filter by status (in_progress, completed)
+        in: query
+        name: status
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of challenge progress
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get my challenge progress
+      tags:
+      - Challenges
+  /components:
+    get:
+      description: Get list of electronic components with optional filters
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Category ID or slug
+        in: query
+        name: category
+        type: string
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      - description: Filter in-stock only
+        in: query
+        name: in_stock
+        type: boolean
+      - default: name
+        description: Sort field (name, price, rating)
+        in: query
+        name: sort
+        type: string
+      - default: asc
+        description: Sort order (asc, desc)
+        in: query
+        name: order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of components with pagination
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid parameters
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: List components
+      tags:
+      - Components
+  /components/{id}:
+    get:
+      description: Get detailed information about a specific electronic component
+      parameters:
+      - description: Component ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Component details
+          schema:
+            $ref: '#/definitions/dto.ComponentResponse'
+        "404":
+          description: Component not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get component details
+      tags:
+      - Components
+  /components/{id}/favorite:
+    post:
+      description: Add or remove component from user's favorites
+      parameters:
+      - description: Component ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Favorite status
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Component not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Toggle component favorite
+      tags:
+      - Components
+  /components/categories:
+    get:
+      description: Get list of all component categories (no auth required)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of categories
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get component categories
+      tags:
+      - Components
+  /components/favorites:
+    get:
+      description: Get user's favorite/saved components
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of favorite components
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get favorite components
+      tags:
+      - Components
+  /components/request:
+    post:
+      consumes:
+      - application/json
+      description: Submit a request to add a new component to the library
+      parameters:
+      - description: Component request data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ComponentRequestCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created request
+          schema:
+            $ref: '#/definitions/dto.ComponentRequestResponse'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Request new component
+      tags:
+      - Components
+  /components/requests:
+    get:
+      description: Get list of component requests submitted by the current user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of requests
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get my component requests
+      tags:
+      - Components
+  /components/search:
+    get:
+      description: Search components by name, part number, or description
+      parameters:
+      - description: Search query (min 2 characters)
+        in: query
+        name: q
+        required: true
+        type: string
+      - description: Category filter
+        in: query
+        name: category
+        type: string
+      - default: 10
+        description: Max results
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Search results
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid parameters
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Search components
+      tags:
+      - Components
+  /leaderboard:
+    get:
+      description: Get leaderboard rankings (weekly, monthly, or all-time)
+      parameters:
+      - default: weekly
+        description: Leaderboard type (weekly, monthly, all_time)
+        in: query
+        name: type
+        type: string
+      - default: 10
+        description: Number of entries to return
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Leaderboard with rankings
+          schema:
+            $ref: '#/definitions/dto.LeaderboardResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get leaderboard
+      tags:
+      - Gamification
+  /notifications:
+    get:
+      description: Get user's notifications with optional filters
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Filter by type (achievement, challenge, system, social)
+        in: query
+        name: type
+        type: string
+      - description: Only unread notifications
+        in: query
+        name: unread_only
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of notifications
+          schema:
+            $ref: '#/definitions/dto.NotificationListResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: List notifications
+      tags:
+      - Notifications
+  /notifications/{id}:
+    delete:
+      description: Delete a specific notification
+      parameters:
+      - description: Notification ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Success message
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Delete notification
+      tags:
+      - Notifications
+  /notifications/{id}/read:
+    put:
+      description: Mark a specific notification as read
+      parameters:
+      - description: Notification ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Success message
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Mark notification as read
+      tags:
+      - Notifications
+  /notifications/read-all:
+    put:
+      description: Mark all user's unread notifications as read
+      responses:
+        "200":
+          description: Success message
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Mark all notifications as read
+      tags:
+      - Notifications
+  /projects:
+    get:
+      consumes:
+      - application/json
+      description: Get list of current user's projects with optional filters
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      - description: Filter by difficulty (Beginner, Intermediate, Advanced)
+        in: query
+        name: difficulty
+        type: string
+      - description: Filter favorites only
+        in: query
+        name: is_favorite
+        type: boolean
+      - description: Filter public/private
+        in: query
+        name: is_public
+        type: boolean
+      - default: created_at
+        description: Sort field (created_at, updated_at, name)
+        in: query
+        name: sort
+        type: string
+      - default: desc
+        description: Sort order (asc, desc)
+        in: query
+        name: order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of projects with pagination
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: List user's projects
+      tags:
+      - Projects
+    post:
+      consumes:
+      - application/json
+      description: Create a new project for the current user
+      parameters:
+      - description: Project data
+        in: body
+        name: project
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProjectCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created project
+          schema:
+            $ref: '#/definitions/dto.ProjectResponse'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Create new project
+      tags:
+      - Projects
+  /projects/{id}:
+    delete:
+      description: Delete a project and all its components (owner only)
+      parameters:
+      - description: Project ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Project deleted
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Access denied
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Delete project
+      tags:
+      - Projects
+    get:
+      description: Get detailed information about a specific project including components
+        and collaborators
+      parameters:
+      - description: Project ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Project details
+          schema:
+            $ref: '#/definitions/dto.ProjectDetailResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Access denied
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Project not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get project details
+      tags:
+      - Projects
+    put:
+      consumes:
+      - application/json
+      description: Update an existing project (owner only)
+      parameters:
+      - description: Project ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Project update data
+        in: body
+        name: project
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProjectUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated project
+          schema:
+            $ref: '#/definitions/dto.ProjectResponse'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Access denied
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Update project
+      tags:
+      - Projects
+  /projects/{id}/duplicate:
+    post:
+      description: Create a copy of an existing project (including components)
+      parameters:
+      - description: Project ID to duplicate (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "201":
+          description: Duplicated project
+          schema:
+            $ref: '#/definitions/dto.ProjectResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Project not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Duplicate project
+      tags:
+      - Projects
+  /projects/{id}/favorite:
+    put:
+      description: Toggle the favorite status of a project
+      parameters:
+      - description: Project ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Favorite status
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Access denied
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Toggle project favorite
+      tags:
+      - Projects
+  /projects/templates:
+    get:
+      description: Get list of public project templates that can be used as starting
+        points
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      responses:
+        "200":
+          description: List of templates
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get project templates
+      tags:
+      - Projects
+  /streak:
+    get:
+      description: Get user's current streak information and history
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Streak information
+          schema:
+            $ref: '#/definitions/dto.StreakResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get streak info
+      tags:
+      - Gamification
+  /users/me:
+    get:
+      description: Get the profile details of the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User profile
+          schema:
+            $ref: '#/definitions/dto.UserResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: User not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get my profile
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      description: Update the profile details of the authenticated user
+      parameters:
+      - description: Profile update data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated profile
+          schema:
+            $ref: '#/definitions/dto.UserResponse'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Username already taken
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Update my profile
+      tags:
+      - Users
+  /users/me/settings:
+    get:
+      description: Get notification and other settings for user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User settings
+          schema:
+            $ref: '#/definitions/dto.UserSettingsResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get my settings
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      description: Update notification and other settings
+      parameters:
+      - description: Settings update data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserSettingsUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated settings
+          schema:
+            $ref: '#/definitions/dto.UserSettingsResponse'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Update my settings
+      tags:
+      - Users
+  /users/me/stats:
+    get:
+      description: Get comprehensive user gamification statistics including XP, level,
+        streak, etc.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User statistics
+          schema:
+            $ref: '#/definitions/dto.UserStatsResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get user stats
+      tags:
+      - Gamification
+securityDefinitions:
+  Bearer:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

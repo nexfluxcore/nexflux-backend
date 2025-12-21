@@ -6,6 +6,7 @@ import (
 	"nexfi-backend/database"
 	"nexfi-backend/dto"
 	"nexfi-backend/models"
+	"nexfi-backend/pkg/storage"
 	"nexfi-backend/utils"
 
 	"github.com/gin-gonic/gin"
@@ -256,5 +257,110 @@ func (h *UserHandler) UpdateUserSettings(c *gin.Context) {
 			NotificationMarketing: settings.NotificationMarketing,
 			NotificationUpdates:   settings.NotificationUpdates,
 		},
+	})
+}
+
+// UploadAvatar godoc
+// @Summary Upload avatar
+// @Description Upload a new avatar image for the authenticated user
+// @Tags Users
+// @Accept multipart/form-data
+// @Produce json
+// @Param avatar formData file true "Avatar image (JPEG, PNG, GIF, WebP, max 5MB)"
+// @Security Bearer
+// @Success 200 {object} map[string]interface{} "Avatar URL"
+// @Failure 400 {object} map[string]string "Invalid file or file too large"
+// @Failure 401 {object} map[string]string "Unauthorized"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /users/me/avatar [post]
+func (h *UserHandler) UploadAvatar(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		utils.RespondWithError(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
+
+	// Get user
+	user, err := h.repo.FindByID(userID.(string))
+	if err != nil {
+		utils.RespondWithError(c, http.StatusNotFound, "User not found")
+		return
+	}
+
+	// Get file from form
+	file, err := c.FormFile("avatar")
+	if err != nil {
+		utils.RespondWithError(c, http.StatusBadRequest, "No file uploaded")
+		return
+	}
+
+	// Delete old avatar if exists
+	storage.DeleteOldAvatar(user.AvatarURL)
+
+	// Upload new avatar
+	avatarURL, err := storage.UploadAvatar(file, userID.(string))
+	if err != nil {
+		switch err {
+		case storage.ErrFileTooLarge:
+			utils.RespondWithError(c, http.StatusBadRequest, "File too large (max 5MB)")
+		case storage.ErrInvalidFileType:
+			utils.RespondWithError(c, http.StatusBadRequest, "Invalid file type. Allowed: JPEG, PNG, GIF, WebP")
+		default:
+			utils.RespondWithError(c, http.StatusInternalServerError, "Failed to upload avatar")
+		}
+		return
+	}
+
+	// Update user avatar URL in database
+	user.AvatarURL = avatarURL
+	if err := h.repo.Update(user); err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to update profile")
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success":    true,
+		"message":    "Avatar uploaded successfully",
+		"avatar_url": avatarURL,
+	})
+}
+
+// DeleteAvatar godoc
+// @Summary Delete avatar
+// @Description Remove the avatar image for the authenticated user
+// @Tags Users
+// @Produce json
+// @Security Bearer
+// @Success 200 {object} map[string]interface{} "Success message"
+// @Failure 401 {object} map[string]string "Unauthorized"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /users/me/avatar [delete]
+func (h *UserHandler) DeleteAvatar(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		utils.RespondWithError(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
+
+	// Get user
+	user, err := h.repo.FindByID(userID.(string))
+	if err != nil {
+		utils.RespondWithError(c, http.StatusNotFound, "User not found")
+		return
+	}
+
+	// Delete avatar file
+	storage.DeleteOldAvatar(user.AvatarURL)
+
+	// Clear avatar URL in database
+	user.AvatarURL = ""
+	if err := h.repo.Update(user); err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to update profile")
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Avatar deleted successfully",
 	})
 }

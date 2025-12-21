@@ -2361,6 +2361,75 @@ paths:
       summary: Update my profile
       tags:
       - Users
+  /users/me/avatar:
+    delete:
+      description: Remove the avatar image for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success message
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Delete avatar
+      tags:
+      - Users
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload a new avatar image for the authenticated user
+      parameters:
+      - description: Avatar image (JPEG, PNG, GIF, WebP, max 5MB)
+        in: formData
+        name: avatar
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Avatar URL
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid file or file too large
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Upload avatar
+      tags:
+      - Users
   /users/me/settings:
     get:
       description: Get notification and other settings for user

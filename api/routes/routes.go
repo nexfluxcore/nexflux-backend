@@ -12,6 +12,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 	// Initialize handlers
 	oauthHandler := handlers.NewOAuthHandler()
 	healthCheckHandler := handlers.NewHealthCheckHandler()
+	userHandler := handlers.NewUserHandler(nil)
 	projectHandler := handlers.NewProjectHandler(db)
 	componentHandler := handlers.NewComponentHandler(db)
 	challengeHandler := handlers.NewChallengeHandler(db)
@@ -20,6 +21,9 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 
 	// Apply CORS middleware globally
 	router.Use(middleware.CORSMiddleware())
+
+	// Serve uploaded files statically
+	router.Static("/uploads", "./uploads")
 
 	// Base API group
 	apiV1 := router.Group("/api/v1")
@@ -85,13 +89,13 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 			// ======== USER ROUTES ========
 			user := protected.Group("/users")
 			{
-				user.GET("/me", handlers.NewUserHandler(nil).GetUserProfile)
-				user.PUT("/me", handlers.NewUserHandler(nil).UpdateUserProfile)
+				user.GET("/me", userHandler.GetUserProfile)
+				user.PUT("/me", userHandler.UpdateUserProfile)
 				user.GET("/me/stats", gamificationHandler.GetUserStats)
-				// user.PUT("/me/avatar", ...)
-				// user.PUT("/me/password", ...)
-				// user.GET("/me/settings", ...)
-				// user.PUT("/me/settings", ...)
+				user.POST("/me/avatar", userHandler.UploadAvatar)
+				user.DELETE("/me/avatar", userHandler.DeleteAvatar)
+				user.GET("/me/settings", userHandler.GetUserSettings)
+				user.PUT("/me/settings", userHandler.UpdateUserSettings)
 			}
 
 			// ======== PROJECT ROUTES ========

@@ -46,7 +46,11 @@ type Storage struct {
 func NewStorage() *Storage {
 	baseURL := os.Getenv("APP_URL")
 	if baseURL == "" {
-		baseURL = "http://localhost:8080"
+		port := os.Getenv("PORT")
+		if port == "" {
+			port = "8080"
+		}
+		baseURL = fmt.Sprintf("http://localhost:%s", port)
 	}
 
 	return &Storage{

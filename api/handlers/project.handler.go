@@ -332,3 +332,44 @@ func (h *ProjectHandler) GetTemplates(c *gin.Context) {
 		},
 	})
 }
+
+// GetCollaborators godoc
+// @Summary Get project collaborators
+// @Description Get list of collaborators for a specific project
+// @Tags Projects
+// @Produce json
+// @Param id path string true "Project ID (UUID)"
+// @Security Bearer
+// @Success 200 {object} map[string]interface{} "List of collaborators"
+// @Failure 401 {object} map[string]string "Unauthorized"
+// @Failure 404 {object} map[string]string "Project not found"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /projects/{id}/collaborators [get]
+func (h *ProjectHandler) GetCollaborators(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		utils.RespondWithError(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
+
+	projectID := c.Param("id")
+
+	collaborators, err := h.service.GetCollaborators(projectID, userID.(string))
+	if err != nil {
+		if err.Error() == "project not found" {
+			utils.RespondWithError(c, http.StatusNotFound, err.Error())
+			return
+		}
+		if err.Error() == "access denied" {
+			utils.RespondWithError(c, http.StatusForbidden, err.Error())
+			return
+		}
+		utils.RespondWithError(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    collaborators,
+	})
+}

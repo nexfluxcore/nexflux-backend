@@ -220,6 +220,47 @@ func (s *ProjectService) GetTemplates(page, limit int) ([]dto.ProjectResponse, d
 	return responses, pagination, nil
 }
 
+// GetCollaborators gets collaborators for a project
+func (s *ProjectService) GetCollaborators(projectID, userID string) ([]dto.CollaboratorResponse, error) {
+	project, err := s.repo.FindByID(projectID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("project not found")
+		}
+		return nil, err
+	}
+
+	// Check access
+	hasAccess, err := s.repo.HasAccess(projectID, userID)
+	if err != nil {
+		return nil, err
+	}
+	if !hasAccess && !project.IsPublic {
+		return nil, errors.New("access denied")
+	}
+
+	collaborators := make([]dto.CollaboratorResponse, len(project.Collaborators))
+	for i, c := range project.Collaborators {
+		collaborators[i] = dto.CollaboratorResponse{
+			ID:         c.ID,
+			UserID:     c.UserID,
+			Role:       string(c.Role),
+			InvitedAt:  c.InvitedAt,
+			AcceptedAt: c.AcceptedAt,
+		}
+		if c.User != nil {
+			collaborators[i].User = &dto.UserResponse{
+				ID:        c.User.ID,
+				Name:      c.User.Name,
+				Username:  c.User.Username,
+				AvatarURL: c.User.AvatarURL,
+			}
+		}
+	}
+
+	return collaborators, nil
+}
+
 // Helper functions
 
 func (s *ProjectService) toProjectResponse(p *models.Project) dto.ProjectResponse {

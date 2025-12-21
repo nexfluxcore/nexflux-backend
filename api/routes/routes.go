@@ -109,9 +109,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 				projects.DELETE("/:id", projectHandler.DeleteProject)
 				projects.POST("/:id/duplicate", projectHandler.DuplicateProject)
 				projects.PUT("/:id/favorite", projectHandler.ToggleFavorite)
-				// projects.GET("/:id/collaborators", ...)
-				// projects.POST("/:id/collaborators", ...)
-				// projects.DELETE("/:id/collaborators/:userId", ...)
+				projects.GET("/:id/collaborators", projectHandler.GetCollaborators)
 			}
 
 			// ======== COMPONENT ROUTES ========

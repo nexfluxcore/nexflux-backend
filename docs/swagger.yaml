@@ -2147,6 +2147,46 @@ paths:
       summary: Update project
       tags:
       - Projects
+  /projects/{id}/collaborators:
+    get:
+      description: Get list of collaborators for a specific project
+      parameters:
+      - description: Project ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of collaborators
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Project not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get project collaborators
+      tags:
+      - Projects
   /projects/{id}/duplicate:
     post:
       description: Create a copy of an existing project (including components)

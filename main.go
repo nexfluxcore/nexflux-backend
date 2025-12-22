@@ -46,9 +46,13 @@ func main() {
 	// Initialize OAuth providers
 	config.InitOAuthConfig()
 
-	// Initialize file storage
-	if err := storage.InitStorage(); err != nil {
-		log.Printf("Warning: Failed to initialize storage: %v", err)
+	// Initialize cloud storage (MinIO or local)
+	if err := storage.InitCloudStorage(); err != nil {
+		log.Printf("Warning: Failed to initialize cloud storage: %v", err)
+		// Fallback to old local storage
+		if err := storage.InitStorage(); err != nil {
+			log.Printf("Warning: Failed to initialize local storage: %v", err)
+		}
 	}
 
 	// Run seeders (only seeds if data doesn't exist)

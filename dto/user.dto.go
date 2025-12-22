@@ -29,11 +29,12 @@ type UserResponse struct {
 
 // UserUpdateRequest for updating user profile
 type UserUpdateRequest struct {
-	Name     string `json:"name" binding:"omitempty,max=100"`
-	Username string `json:"username" binding:"omitempty,max=50"`
-	Bio      string `json:"bio" binding:"omitempty,max=500"`
-	Language string `json:"language" binding:"omitempty,oneof=en id jp"`
-	Theme    string `json:"theme" binding:"omitempty,oneof=light dark system"`
+	Name      string `json:"name" binding:"omitempty,max=100"`
+	Username  string `json:"username" binding:"omitempty,max=50"`
+	Bio       string `json:"bio" binding:"omitempty,max=500"`
+	AvatarURL string `json:"avatar_url" binding:"omitempty,url"` // URL from upload endpoint
+	Language  string `json:"language" binding:"omitempty,oneof=en id jp"`
+	Theme     string `json:"theme" binding:"omitempty,oneof=light dark system"`
 }
 
 // UserStatsResponse for gamification stats

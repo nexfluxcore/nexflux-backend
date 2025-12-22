@@ -122,6 +122,13 @@ func (h *UserHandler) UpdateUserProfile(c *gin.Context) {
 	if input.Bio != "" {
 		user.Bio = input.Bio
 	}
+	if input.AvatarURL != "" {
+		// Delete old avatar if exists and different from new one
+		if user.AvatarURL != "" && user.AvatarURL != input.AvatarURL {
+			storage.DeleteOldAvatar(user.AvatarURL)
+		}
+		user.AvatarURL = input.AvatarURL
+	}
 	if input.Language != "" {
 		user.Language = input.Language
 	}

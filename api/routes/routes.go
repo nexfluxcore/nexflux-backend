@@ -20,6 +20,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 	notificationHandler := handlers.NewNotificationHandler(db)
 	gamificationHandler := handlers.NewGamificationHandler(db)
 	docHandler := handlers.NewDocHandler(db)
+	uploadHandler := handlers.NewUploadHandler()
 
 	// Apply CORS middleware globally
 	router.Use(middleware.CORSMiddleware())
@@ -150,6 +151,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 				projects.DELETE("/:id", projectHandler.DeleteProject)
 				projects.POST("/:id/duplicate", projectHandler.DuplicateProject)
 				projects.PUT("/:id/favorite", projectHandler.ToggleFavorite)
+				projects.POST("/:id/favorite", projectHandler.ToggleFavorite) // Also support POST
 				projects.GET("/:id/collaborators", projectHandler.GetCollaborators)
 				projects.POST("/:id/collaborators", projectHandler.AddCollaborator)
 				projects.DELETE("/:id/collaborators/:userId", projectHandler.RemoveCollaborator)
@@ -193,6 +195,14 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 			protected.GET("/achievements/user", gamificationHandler.GetUserAchievements)
 			protected.GET("/leaderboard", gamificationHandler.GetLeaderboard)
 			protected.GET("/streak", gamificationHandler.GetStreak)
+
+			// ======== UPLOAD ROUTES ========
+			upload := protected.Group("/upload")
+			{
+				upload.POST("", uploadHandler.Upload)
+				upload.POST("/multiple", uploadHandler.UploadMultiple)
+				upload.DELETE("", uploadHandler.DeleteFile)
+			}
 		}
 	}
 }

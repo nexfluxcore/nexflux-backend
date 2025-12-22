@@ -315,6 +315,11 @@ func InvalidateToken(userId string) error {
 	return Delete(BuildKey("token", userId))
 }
 
+// InvalidateUserTokens is an alias for InvalidateToken
+func InvalidateUserTokens(userId string) error {
+	return InvalidateToken(userId)
+}
+
 // Session operations
 func StoreSession(sessionId string, data interface{}, expiration time.Duration) error {
 	return SetJSON(BuildKey("session", sessionId), data, expiration)

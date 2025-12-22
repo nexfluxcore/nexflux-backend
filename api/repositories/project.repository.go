@@ -191,13 +191,30 @@ func (r *ProjectRepository) GetCollaborators(projectID string) ([]models.Project
 }
 
 // AddCollaborator adds a collaborator to project
-func (r *ProjectRepository) AddCollaborator(collab *models.ProjectCollaborator) error {
-	return r.DB.Create(collab).Error
+func (r *ProjectRepository) AddCollaborator(projectID, userID, role string) (*models.ProjectCollaborator, error) {
+	collab := &models.ProjectCollaborator{
+		ProjectID: projectID,
+		UserID:    userID,
+		Role:      models.CollaboratorRole(role),
+	}
+	err := r.DB.Create(collab).Error
+	return collab, err
 }
 
-// RemoveCollaborator removes a collaborator from project
-func (r *ProjectRepository) RemoveCollaborator(projectID, userID string) error {
-	return r.DB.Delete(&models.ProjectCollaborator{}, "project_id = ? AND user_id = ?", projectID, userID).Error
+// FindCollaborator finds a collaborator by project and user ID
+func (r *ProjectRepository) FindCollaborator(projectID, userID string) (*models.ProjectCollaborator, error) {
+	var collab models.ProjectCollaborator
+	err := r.DB.Where("project_id = ? AND user_id = ?", projectID, userID).
+		First(&collab).Error
+	if err != nil {
+		return nil, err
+	}
+	return &collab, nil
+}
+
+// RemoveCollaborator removes a collaborator by ID
+func (r *ProjectRepository) RemoveCollaborator(collaboratorID string) error {
+	return r.DB.Delete(&models.ProjectCollaborator{}, "id = ?", collaboratorID).Error
 }
 
 // IsOwner checks if user is project owner

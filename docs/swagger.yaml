@@ -46,8 +46,26 @@ definitions:
       unlocked:
         type: integer
     type: object
+  dto.AddCollaboratorRequest:
+    properties:
+      email:
+        type: string
+      role:
+        enum:
+        - editor
+        - viewer
+        type: string
+    required:
+    - email
+    - role
+    type: object
   dto.AuthResponse:
     properties:
+      expires_in:
+        description: seconds
+        type: integer
+      refresh_token:
+        type: string
       token:
         type: string
       user:
@@ -196,6 +214,17 @@ definitions:
         type: integer
       total_available:
         type: integer
+    type: object
+  dto.ChangePasswordRequest:
+    properties:
+      current_password:
+        type: string
+      new_password:
+        minLength: 8
+        type: string
+    required:
+    - current_password
+    - new_password
     type: object
   dto.CollaboratorResponse:
     properties:
@@ -532,6 +561,13 @@ definitions:
       views:
         type: integer
     type: object
+  dto.ForgotPasswordRequest:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
   dto.LeaderboardEntryResponse:
     properties:
       is_current_user:
@@ -834,18 +870,50 @@ definitions:
       thumbnail_url:
         type: string
     type: object
+  dto.RefreshTokenRequest:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  dto.RefreshTokenResponse:
+    properties:
+      expires_in:
+        description: seconds
+        type: integer
+      refresh_token:
+        type: string
+      token:
+        type: string
+    type: object
   dto.RegisterRequest:
     properties:
       email:
         type: string
+      name:
+        minLength: 2
+        type: string
       password:
-        minLength: 6
+        minLength: 8
         type: string
       username:
         type: string
     required:
     - email
+    - name
     - password
+    type: object
+  dto.ResetPasswordRequest:
+    properties:
+      password:
+        minLength: 8
+        type: string
+      token:
+        type: string
+    required:
+    - password
+    - token
     type: object
   dto.StreakInfo:
     properties:
@@ -918,10 +986,22 @@ definitions:
         type: string
       id:
         type: string
+      is_pro:
+        type: boolean
       is_verified:
         type: boolean
+      level:
+        type: integer
+      name:
+        type: string
       provider:
         type: string
+      role:
+        type: string
+      streak_days:
+        type: integer
+      total_xp:
+        type: integer
       username:
         type: string
     type: object
@@ -1223,6 +1303,66 @@ paths:
       summary: Handle OAuth callback via POST
       tags:
       - Auth
+  /auth/change-password:
+    put:
+      consumes:
+      - application/json
+      description: Change password for authenticated user
+      parameters:
+      - description: Current and new password
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Password changed
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid password
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Change password
+      tags:
+      - Auth
+  /auth/forgot-password:
+    post:
+      consumes:
+      - application/json
+      description: Send password reset email to user
+      parameters:
+      - description: Email address
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ForgotPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Reset email sent (always returns success for security)
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Request password reset
+      tags:
+      - Auth
   /auth/login:
     post:
       consumes:
@@ -1257,6 +1397,47 @@ paths:
       summary: Login with email and password
       tags:
       - Auth
+  /auth/logout:
+    post:
+      description: Invalidate user's tokens
+      responses:
+        "200":
+          description: Logged out
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Logout user
+      tags:
+      - Auth
+  /auth/me:
+    get:
+      description: Get profile of authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User profile
+          schema:
+            $ref: '#/definitions/dto.UserAuthInfo'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get current user
+      tags:
+      - Auth
   /auth/providers:
     get:
       description: Returns list of OAuth providers that are configured and available
@@ -1272,6 +1453,34 @@ paths:
               type: array
             type: object
       summary: Get list of supported OAuth providers
+      tags:
+      - Auth
+  /auth/refresh-token:
+    post:
+      consumes:
+      - application/json
+      description: Get new access token using refresh token
+      parameters:
+      - description: Refresh token
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: New tokens
+          schema:
+            $ref: '#/definitions/dto.RefreshTokenResponse'
+        "401":
+          description: Invalid refresh token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Refresh access token
       tags:
       - Auth
   /auth/register:
@@ -1312,6 +1521,61 @@ paths:
               type: string
             type: object
       summary: Register a new user with email and password
+      tags:
+      - Auth
+  /auth/reset-password:
+    post:
+      consumes:
+      - application/json
+      description: Reset user password with valid token
+      parameters:
+      - description: Token and new password
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ResetPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Password reset successful
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid token or password
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Reset password
+      tags:
+      - Auth
+  /auth/verify-reset-token:
+    get:
+      description: Check if a password reset token is valid
+      parameters:
+      - description: Reset token
+        in: query
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Token is valid
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid or expired token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Verify password reset token
       tags:
       - Auth
   /challenges:
@@ -2693,6 +2957,119 @@ paths:
       security:
       - Bearer: []
       summary: Get project collaborators
+      tags:
+      - Projects
+    post:
+      consumes:
+      - application/json
+      description: Invite a user to collaborate on a project by email
+      parameters:
+      - description: Project ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Collaborator data
+        in: body
+        name: collaborator
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AddCollaboratorRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Added collaborator
+          schema:
+            $ref: '#/definitions/dto.CollaboratorResponse'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Access denied (owner only)
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Project or user not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: User already a collaborator
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Add collaborator to project
+      tags:
+      - Projects
+  /projects/{id}/collaborators/{userId}:
+    delete:
+      description: Remove a collaborator from a project
+      parameters:
+      - description: Project ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User ID to remove (UUID)
+        in: path
+        name: userId
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Success message
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Access denied
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Project or collaborator not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Remove collaborator from project
       tags:
       - Projects
   /projects/{id}/duplicate:

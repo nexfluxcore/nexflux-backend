@@ -93,23 +93,5 @@ type UserSettingsUpdateRequest struct {
 	NotificationUpdates   *bool `json:"notification_updates"`
 }
 
-// ============================================
-// Password DTOs
-// ============================================
-
-// ChangePasswordRequest for changing password
-type ChangePasswordRequest struct {
-	CurrentPassword string `json:"current_password" binding:"required,min=6"`
-	NewPassword     string `json:"new_password" binding:"required,min=6"`
-}
-
-// ForgotPasswordRequest for password reset request
-type ForgotPasswordRequest struct {
-	Email string `json:"email" binding:"required,email"`
-}
-
-// ResetPasswordRequest for resetting password
-type ResetPasswordRequest struct {
-	Token       string `json:"token" binding:"required"`
-	NewPassword string `json:"new_password" binding:"required,min=6"`
-}
+// NOTE: Password-related DTOs (ChangePasswordRequest, ForgotPasswordRequest, ResetPasswordRequest)
+// are defined in auth.dto.go

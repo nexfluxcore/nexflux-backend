@@ -134,6 +134,13 @@ func RunMigrations() {
 				&models.DocVideo{},
 			},
 		},
+		{
+			Name: "Auth Tokens",
+			Models: []interface{}{
+				&models.PasswordResetToken{},
+				&models.EmailVerificationToken{},
+			},
+		},
 	}
 
 	for _, migration := range migrations {

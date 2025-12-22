@@ -373,3 +373,105 @@ func (h *ProjectHandler) GetCollaborators(c *gin.Context) {
 		"data":    collaborators,
 	})
 }
+
+// AddCollaborator godoc
+// @Summary Add collaborator to project
+// @Description Invite a user to collaborate on a project by email
+// @Tags Projects
+// @Accept json
+// @Produce json
+// @Param id path string true "Project ID (UUID)"
+// @Param collaborator body dto.AddCollaboratorRequest true "Collaborator data"
+// @Security Bearer
+// @Success 201 {object} dto.CollaboratorResponse "Added collaborator"
+// @Failure 400 {object} map[string]string "Invalid input"
+// @Failure 401 {object} map[string]string "Unauthorized"
+// @Failure 403 {object} map[string]string "Access denied (owner only)"
+// @Failure 404 {object} map[string]string "Project or user not found"
+// @Failure 409 {object} map[string]string "User already a collaborator"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /projects/{id}/collaborators [post]
+func (h *ProjectHandler) AddCollaborator(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		utils.RespondWithError(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
+
+	projectID := c.Param("id")
+
+	var req dto.AddCollaboratorRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.RespondWithError(c, http.StatusBadRequest, "Invalid input: "+err.Error())
+		return
+	}
+
+	collaborator, err := h.service.AddCollaborator(projectID, userID.(string), req)
+	if err != nil {
+		switch err.Error() {
+		case "project not found":
+			utils.RespondWithError(c, http.StatusNotFound, err.Error())
+		case "user not found":
+			utils.RespondWithError(c, http.StatusNotFound, "User with this email not found")
+		case "access denied":
+			utils.RespondWithError(c, http.StatusForbidden, "Only project owner can add collaborators")
+		case "already a collaborator":
+			utils.RespondWithError(c, http.StatusConflict, "User is already a collaborator")
+		case "cannot add yourself":
+			utils.RespondWithError(c, http.StatusBadRequest, "Cannot add yourself as a collaborator")
+		default:
+			utils.RespondWithError(c, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"success": true,
+		"message": "Collaborator added successfully",
+		"data":    collaborator,
+	})
+}
+
+// RemoveCollaborator godoc
+// @Summary Remove collaborator from project
+// @Description Remove a collaborator from a project
+// @Tags Projects
+// @Param id path string true "Project ID (UUID)"
+// @Param userId path string true "User ID to remove (UUID)"
+// @Security Bearer
+// @Success 200 {object} map[string]interface{} "Success message"
+// @Failure 401 {object} map[string]string "Unauthorized"
+// @Failure 403 {object} map[string]string "Access denied"
+// @Failure 404 {object} map[string]string "Project or collaborator not found"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /projects/{id}/collaborators/{userId} [delete]
+func (h *ProjectHandler) RemoveCollaborator(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		utils.RespondWithError(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
+
+	projectID := c.Param("id")
+	collaboratorUserID := c.Param("userId")
+
+	err := h.service.RemoveCollaborator(projectID, userID.(string), collaboratorUserID)
+	if err != nil {
+		switch err.Error() {
+		case "project not found":
+			utils.RespondWithError(c, http.StatusNotFound, err.Error())
+		case "collaborator not found":
+			utils.RespondWithError(c, http.StatusNotFound, "Collaborator not found")
+		case "access denied":
+			utils.RespondWithError(c, http.StatusForbidden, "Only project owner can remove collaborators")
+		default:
+			utils.RespondWithError(c, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Collaborator removed successfully",
+	})
+}

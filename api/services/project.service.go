@@ -261,6 +261,76 @@ func (s *ProjectService) GetCollaborators(projectID, userID string) ([]dto.Colla
 	return collaborators, nil
 }
 
+// AddCollaborator adds a collaborator to a project
+func (s *ProjectService) AddCollaborator(projectID, ownerID string, req dto.AddCollaboratorRequest) (*dto.CollaboratorResponse, error) {
+	// Get project and verify ownership
+	project, err := s.repo.FindByIDSimple(projectID)
+	if err != nil {
+		return nil, errors.New("project not found")
+	}
+
+	if project.UserID != ownerID {
+		return nil, errors.New("access denied")
+	}
+
+	// Find user by email
+	invitedUser, err := s.userRepo.FindByEmail(req.Email)
+	if err != nil {
+		return nil, errors.New("user not found")
+	}
+
+	// Cannot add yourself
+	if invitedUser.ID == ownerID {
+		return nil, errors.New("cannot add yourself")
+	}
+
+	// Check if already a collaborator
+	existing, _ := s.repo.FindCollaborator(projectID, invitedUser.ID)
+	if existing != nil {
+		return nil, errors.New("already a collaborator")
+	}
+
+	// Create collaborator
+	collaborator, err := s.repo.AddCollaborator(projectID, invitedUser.ID, req.Role)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.CollaboratorResponse{
+		ID:        collaborator.ID,
+		UserID:    collaborator.UserID,
+		Role:      string(collaborator.Role),
+		InvitedAt: collaborator.InvitedAt,
+		User: &dto.UserResponse{
+			ID:        invitedUser.ID,
+			Name:      invitedUser.Name,
+			Username:  invitedUser.Username,
+			AvatarURL: invitedUser.AvatarURL,
+		},
+	}, nil
+}
+
+// RemoveCollaborator removes a collaborator from a project
+func (s *ProjectService) RemoveCollaborator(projectID, ownerID, collaboratorUserID string) error {
+	// Get project and verify ownership
+	project, err := s.repo.FindByIDSimple(projectID)
+	if err != nil {
+		return errors.New("project not found")
+	}
+
+	if project.UserID != ownerID {
+		return errors.New("access denied")
+	}
+
+	// Find collaborator
+	collaborator, err := s.repo.FindCollaborator(projectID, collaboratorUserID)
+	if err != nil || collaborator == nil {
+		return errors.New("collaborator not found")
+	}
+
+	return s.repo.RemoveCollaborator(collaborator.ID)
+}
+
 // Helper functions
 
 func (s *ProjectService) toProjectResponse(p *models.Project) dto.ProjectResponse {

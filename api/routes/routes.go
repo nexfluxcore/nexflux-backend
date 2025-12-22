@@ -11,6 +11,7 @@ import (
 func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 	// Initialize handlers
 	oauthHandler := handlers.NewOAuthHandler()
+	authHandler := handlers.NewAuthHandler()
 	healthCheckHandler := handlers.NewHealthCheckHandler()
 	userHandler := handlers.NewUserHandler(nil)
 	projectHandler := handlers.NewProjectHandler(db)
@@ -46,9 +47,17 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 		// ========================================
 		auth := apiV1.Group("/auth")
 		{
-			// Email/Password authentication
-			auth.POST("/register", oauthHandler.RegisterWithPassword)
-			auth.POST("/login", oauthHandler.LoginWithPassword)
+			// Email/Password authentication (using new authHandler)
+			auth.POST("/register", authHandler.Register)
+			auth.POST("/login", authHandler.Login)
+
+			// Password reset flow (public)
+			auth.POST("/forgot-password", authHandler.ForgotPassword)
+			auth.GET("/verify-reset-token", authHandler.VerifyResetToken)
+			auth.POST("/reset-password", authHandler.ResetPassword)
+
+			// Token refresh (public)
+			auth.POST("/refresh-token", authHandler.RefreshToken)
 
 			// OAuth providers list
 			auth.GET("/providers", oauthHandler.GetSupportedProviders)
@@ -72,6 +81,15 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 			auth.GET("/:provider", oauthHandler.GetOAuthURL)
 			auth.GET("/:provider/callback", oauthHandler.HandleOAuthCallback)
 			auth.POST("/:provider/callback", oauthHandler.HandleOAuthCallbackPost)
+		}
+
+		// Protected auth routes (requires JWT)
+		authProtected := apiV1.Group("/auth")
+		authProtected.Use(middleware.JWTAuthMiddleware())
+		{
+			auth.PUT("/change-password", authHandler.ChangePassword)
+			auth.POST("/logout", authHandler.Logout)
+			auth.GET("/me", authHandler.GetMe)
 		}
 
 		// ========================================
@@ -133,6 +151,8 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 				projects.POST("/:id/duplicate", projectHandler.DuplicateProject)
 				projects.PUT("/:id/favorite", projectHandler.ToggleFavorite)
 				projects.GET("/:id/collaborators", projectHandler.GetCollaborators)
+				projects.POST("/:id/collaborators", projectHandler.AddCollaborator)
+				projects.DELETE("/:id/collaborators/:userId", projectHandler.RemoveCollaborator)
 			}
 
 			// ======== COMPONENT ROUTES ========

@@ -18,6 +18,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 	challengeHandler := handlers.NewChallengeHandler(db)
 	notificationHandler := handlers.NewNotificationHandler(db)
 	gamificationHandler := handlers.NewGamificationHandler(db)
+	docHandler := handlers.NewDocHandler(db)
 
 	// Apply CORS middleware globally
 	router.Use(middleware.CORSMiddleware())
@@ -79,6 +80,28 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 
 		// Component categories (public)
 		apiV1.GET("/components/categories", componentHandler.GetCategories)
+
+		// ======== DOCUMENTATION ROUTES (Public) ========
+		docs := apiV1.Group("/docs")
+		{
+			// Categories
+			docs.GET("/categories", docHandler.GetCategories)
+			docs.GET("/categories/:slug", docHandler.GetCategoryBySlug)
+
+			// Articles
+			docs.GET("/articles", docHandler.ListArticles)
+			docs.GET("/articles/popular", docHandler.GetPopularArticles)
+			docs.GET("/articles/featured", docHandler.GetFeaturedArticles)
+			docs.GET("/articles/:slug", docHandler.GetArticleBySlug)
+			docs.POST("/articles/:slug/view", docHandler.IncrementArticleView)
+
+			// Videos
+			docs.GET("/videos", docHandler.ListVideos)
+			docs.GET("/videos/:id", docHandler.GetVideoByID)
+
+			// Search
+			docs.GET("/search", docHandler.Search)
+		}
 
 		// ========================================
 		// PROTECTED ROUTES (Requires JWT)

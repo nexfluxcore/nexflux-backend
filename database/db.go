@@ -126,6 +126,14 @@ func RunMigrations() {
 				&models.LeaderboardEntry{},
 			},
 		},
+		{
+			Name: "Documentation Module",
+			Models: []interface{}{
+				&models.DocCategory{},
+				&models.DocArticle{},
+				&models.DocVideo{},
+			},
+		},
 	}
 
 	for _, migration := range migrations {

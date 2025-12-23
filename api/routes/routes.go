@@ -21,12 +21,22 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 	gamificationHandler := handlers.NewGamificationHandler(db)
 	docHandler := handlers.NewDocHandler(db)
 	uploadHandler := handlers.NewUploadHandler()
+	labHandler := handlers.NewLabHandler(db)
+	labWSHandler := handlers.NewLabWSHandler(db)
 
 	// Apply CORS middleware globally
 	router.Use(middleware.CORSMiddleware())
 
 	// Serve uploaded files statically
 	router.Static("/uploads", "./uploads")
+
+	// ========================================
+	// WEBSOCKET ROUTES (No auth required for connection, auth checked inside)
+	// ========================================
+	ws := router.Group("/ws")
+	{
+		ws.GET("/labs/:id", labWSHandler.HandleLabWebSocket)
+	}
 
 	// Base API group
 	apiV1 := router.Group("/api/v1")
@@ -202,6 +212,35 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 				upload.POST("", uploadHandler.Upload)
 				upload.POST("/multiple", uploadHandler.UploadMultiple)
 				upload.DELETE("", uploadHandler.DeleteFile)
+			}
+
+			// ======== LAB ROUTES ========
+			labs := protected.Group("/labs")
+			{
+				// Lab listing and details
+				labs.GET("", labHandler.ListLabs)
+				labs.GET("/session/active", labHandler.GetActiveSession)
+				labs.GET("/session/history", labHandler.GetSessionHistory)
+				labs.GET("/:id", labHandler.GetLab)
+				labs.GET("/slug/:slug", labHandler.GetLabBySlug)
+
+				// Queue management
+				labs.POST("/:id/queue", labHandler.JoinQueue)
+				labs.DELETE("/:id/queue", labHandler.LeaveQueue)
+				labs.GET("/:id/queue/status", labHandler.GetQueueStatus)
+
+				// Session management
+				labs.POST("/:id/session/start", labHandler.StartSession)
+				labs.POST("/:id/session/end", labHandler.EndSession)
+
+				// Code execution
+				labs.POST("/:id/code/submit", labHandler.SubmitCode)
+				labs.GET("/:id/code/status/:compilation_id", labHandler.GetCompilationStatus)
+
+				// Sensor/Actuator control
+				labs.GET("/:id/sensors", labHandler.GetSensors)
+				labs.POST("/:id/actuators/control", labHandler.ControlActuator)
+				labs.POST("/:id/serial", labHandler.SendSerialCommand)
 			}
 		}
 	}

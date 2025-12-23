@@ -10,12 +10,16 @@ import (
 type NotificationType string
 
 const (
-	NotifAchievement NotificationType = "achievement"
-	NotifXP          NotificationType = "xp"
-	NotifProject     NotificationType = "project"
-	NotifChallenge   NotificationType = "challenge"
-	NotifSocial      NotificationType = "social"
-	NotifSystem      NotificationType = "system"
+	NotifAchievement    NotificationType = "achievement"
+	NotifXP             NotificationType = "xp"
+	NotifProject        NotificationType = "project"
+	NotifChallenge      NotificationType = "challenge"
+	NotifSocial         NotificationType = "social"
+	NotifSystem         NotificationType = "system"
+	NotifLabAvailable   NotificationType = "lab_available"
+	NotifSessionExpired NotificationType = "session_expired"
+	NotifQueueExpired   NotificationType = "queue_expired"
+	NotifLevelUp        NotificationType = "level_up"
 )
 
 // Notification represents user notifications

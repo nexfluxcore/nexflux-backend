@@ -46,6 +46,38 @@ definitions:
       unlocked:
         type: integer
     type: object
+  dto.ActiveSessionResponse:
+    properties:
+      hardware_config:
+        $ref: '#/definitions/dto.HardwareConfig'
+      lab_id:
+        type: string
+      lab_name:
+        type: string
+      livekit_token:
+        type: string
+      livekit_url:
+        type: string
+      remaining_seconds:
+        type: integer
+      room_name:
+        type: string
+      session_id:
+        type: string
+    type: object
+  dto.ActuatorSpec:
+    properties:
+      name:
+        type: string
+      pin:
+        type: string
+      pins:
+        additionalProperties:
+          type: string
+        type: object
+      type:
+        type: string
+    type: object
   dto.AddCollaboratorRequest:
     properties:
       email:
@@ -241,6 +273,17 @@ definitions:
       user_id:
         type: string
     type: object
+  dto.CompilationStatusResponse:
+    properties:
+      errors:
+        type: string
+      output:
+        type: string
+      status:
+        type: string
+      uploaded_at:
+        type: string
+    type: object
   dto.ComponentRequestCreateRequest:
     properties:
       category:
@@ -352,6 +395,30 @@ definitions:
         type: array
       stock:
         type: integer
+    type: object
+  dto.ControlActuatorRequest:
+    properties:
+      action:
+        type: string
+      actuator:
+        type: string
+      params:
+        additionalProperties: true
+        type: object
+    required:
+    - action
+    - actuator
+    type: object
+  dto.ControlActuatorResponse:
+    properties:
+      action:
+        type: string
+      actuator:
+        type: string
+      message:
+        type: string
+      success:
+        type: boolean
     type: object
   dto.DailyChallengeResponse:
     properties:
@@ -561,12 +628,135 @@ definitions:
       views:
         type: integer
     type: object
+  dto.EndSessionRequest:
+    properties:
+      feedback:
+        type: string
+      rating:
+        maximum: 5
+        minimum: 1
+        type: integer
+    type: object
+  dto.EndSessionResponse:
+    properties:
+      duration_seconds:
+        type: integer
+      message:
+        type: string
+      session_id:
+        type: string
+      xp_earned:
+        type: integer
+    type: object
   dto.ForgotPasswordRequest:
     properties:
       email:
         type: string
     required:
     - email
+    type: object
+  dto.HardwareConfig:
+    properties:
+      baud_rate:
+        type: integer
+      board:
+        type: string
+      serial_port:
+        type: string
+    type: object
+  dto.JoinQueueRequest:
+    properties:
+      bid_amount:
+        description: XP to bid for priority (optional)
+        type: integer
+    type: object
+  dto.JoinQueueResponse:
+    properties:
+      estimated_wait:
+        description: seconds
+        type: integer
+      expires_at:
+        type: string
+      position:
+        type: integer
+      queue_id:
+        type: string
+    type: object
+  dto.LabCurrentUserInfo:
+    properties:
+      avatar_url:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      session_remaining:
+        description: seconds
+        type: integer
+    type: object
+  dto.LabDetailResponse:
+    properties:
+      created_at:
+        type: string
+      current_user:
+        $ref: '#/definitions/dto.LabCurrentUserInfo'
+      description:
+        type: string
+      hardware_specs:
+        additionalProperties: true
+        type: object
+      hardware_specs_detailed:
+        $ref: '#/definitions/dto.LabHardwareSpecs'
+      id:
+        type: string
+      is_online:
+        type: boolean
+      max_session_duration:
+        type: integer
+      name:
+        type: string
+      platform:
+        type: string
+      queue:
+        items:
+          $ref: '#/definitions/dto.LabQueueEntryBrief'
+        type: array
+      queue_count:
+        type: integer
+      slug:
+        type: string
+      status:
+        type: string
+      thumbnail_url:
+        type: string
+      total_sessions:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  dto.LabHardwareSpecs:
+    properties:
+      actuators:
+        items:
+          $ref: '#/definitions/dto.ActuatorSpec'
+        type: array
+      board:
+        type: string
+      camera:
+        type: string
+      sensors:
+        items:
+          $ref: '#/definitions/dto.SensorSpec'
+        type: array
+    type: object
+  dto.LabQueueEntryBrief:
+    properties:
+      bid_amount:
+        type: integer
+      position:
+        type: integer
+      user_name:
+        type: string
     type: object
   dto.LeaderboardEntryResponse:
     properties:
@@ -870,6 +1060,18 @@ definitions:
       thumbnail_url:
         type: string
     type: object
+  dto.QueueStatusResponse:
+    properties:
+      bid_amount:
+        type: integer
+      estimated_wait:
+        description: seconds
+        type: integer
+      expires_at:
+        type: string
+      position:
+        type: integer
+    type: object
   dto.RefreshTokenRequest:
     properties:
       refresh_token:
@@ -914,6 +1116,56 @@ definitions:
     required:
     - password
     - token
+    type: object
+  dto.SensorDataResponse:
+    properties:
+      sensors:
+        additionalProperties: true
+        type: object
+      timestamp:
+        type: string
+    type: object
+  dto.SensorSpec:
+    properties:
+      name:
+        type: string
+      pin:
+        type: string
+      pins:
+        additionalProperties:
+          type: string
+        type: object
+      type:
+        type: string
+    type: object
+  dto.SerialCommandRequest:
+    properties:
+      command:
+        type: string
+    required:
+    - command
+    type: object
+  dto.SerialCommandResponse:
+    properties:
+      response:
+        type: string
+      success:
+        type: boolean
+    type: object
+  dto.StartSessionResponse:
+    properties:
+      expires_at:
+        type: string
+      hardware_config:
+        $ref: '#/definitions/dto.HardwareConfig'
+      livekit_token:
+        type: string
+      livekit_url:
+        type: string
+      room_name:
+        type: string
+      session_id:
+        type: string
     type: object
   dto.StreakInfo:
     properties:
@@ -964,6 +1216,33 @@ definitions:
         type: integer
       xp_earned:
         type: integer
+    type: object
+  dto.SubmitCodeRequest:
+    properties:
+      code:
+        type: string
+      filename:
+        type: string
+      language:
+        enum:
+        - arduino
+        - micropython
+        - c
+        - cpp
+        type: string
+      session_id:
+        type: string
+    required:
+    - code
+    - language
+    - session_id
+    type: object
+  dto.SubmitCodeResponse:
+    properties:
+      compilation_id:
+        type: string
+      status:
+        type: string
     type: object
   dto.UpdateProgressRequest:
     properties:
@@ -2520,6 +2799,678 @@ paths:
       summary: Get video details
       tags:
       - Documentation
+  /labs:
+    get:
+      consumes:
+      - application/json
+      description: Get list of available labs with optional filters
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Filter by platform (arduino_uno, esp32, etc.)
+        in: query
+        name: platform
+        type: string
+      - description: Filter by status (available, busy, maintenance, offline)
+        in: query
+        name: status
+        type: string
+      - description: Search by name or description
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of labs with pagination
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List available labs
+      tags:
+      - Labs
+  /labs/{id}:
+    get:
+      description: Get detailed information about a specific lab including hardware
+        specs and queue
+      parameters:
+      - description: Lab ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Lab details
+          schema:
+            $ref: '#/definitions/dto.LabDetailResponse'
+        "404":
+          description: Lab not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get lab details
+      tags:
+      - Labs
+  /labs/{id}/actuators/control:
+    post:
+      consumes:
+      - application/json
+      description: Send a control command to a lab actuator (LED, servo, buzzer, etc.)
+      parameters:
+      - description: Lab ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Actuator control request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ControlActuatorRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Actuator control result
+          schema:
+            $ref: '#/definitions/dto.ControlActuatorResponse'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Access denied
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: No active session
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Control actuator
+      tags:
+      - Labs
+  /labs/{id}/code/status/{compilation_id}:
+    get:
+      description: Get the status of a code compilation job
+      parameters:
+      - description: Lab ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Compilation ID (UUID)
+        in: path
+        name: compilation_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Compilation status
+          schema:
+            $ref: '#/definitions/dto.CompilationStatusResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Access denied
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Compilation not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get compilation status
+      tags:
+      - Labs
+  /labs/{id}/code/submit:
+    post:
+      consumes:
+      - application/json
+      description: Submit code to be compiled and uploaded to the lab hardware
+      parameters:
+      - description: Lab ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Code submission request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SubmitCodeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Code submitted successfully
+          schema:
+            $ref: '#/definitions/dto.SubmitCodeResponse'
+        "400":
+          description: Invalid input or no active session
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Access denied
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Submit code for compilation
+      tags:
+      - Labs
+  /labs/{id}/queue:
+    delete:
+      description: Leave the queue for a specific lab
+      parameters:
+      - description: Lab ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Successfully left queue
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not in queue
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Leave lab queue
+      tags:
+      - Labs
+    post:
+      consumes:
+      - application/json
+      description: Join the queue for a specific lab to reserve a session
+      parameters:
+      - description: Lab ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Queue join request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.JoinQueueRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Queue join result
+          schema:
+            $ref: '#/definitions/dto.JoinQueueResponse'
+        "400":
+          description: Invalid input or already in queue
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Lab not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Join lab queue
+      tags:
+      - Labs
+  /labs/{id}/queue/status:
+    get:
+      description: Get user's current queue status for a lab
+      parameters:
+      - description: Lab ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Queue status
+          schema:
+            $ref: '#/definitions/dto.QueueStatusResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not in queue
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get queue status
+      tags:
+      - Labs
+  /labs/{id}/sensors:
+    get:
+      description: Get current sensor readings from the lab hardware
+      parameters:
+      - description: Lab ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Current sensor data
+          schema:
+            $ref: '#/definitions/dto.SensorDataResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Access denied
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: No active session
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get sensor data
+      tags:
+      - Labs
+  /labs/{id}/serial:
+    post:
+      consumes:
+      - application/json
+      description: Send a serial command directly to the microcontroller
+      parameters:
+      - description: Lab ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Serial command request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SerialCommandRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Serial command result
+          schema:
+            $ref: '#/definitions/dto.SerialCommandResponse'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Access denied
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: No active session
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Send serial command
+      tags:
+      - Labs
+  /labs/{id}/session/end:
+    post:
+      consumes:
+      - application/json
+      description: End the current lab session
+      parameters:
+      - description: Lab ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Session end request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.EndSessionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Session ended successfully
+          schema:
+            $ref: '#/definitions/dto.EndSessionResponse'
+        "400":
+          description: No active session
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Access denied
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: End lab session
+      tags:
+      - Labs
+  /labs/{id}/session/start:
+    post:
+      description: Start a lab session when the lab is available or user is first
+        in queue
+      parameters:
+      - description: Lab ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Session started successfully
+          schema:
+            $ref: '#/definitions/dto.StartSessionResponse'
+        "400":
+          description: Lab not available or already has session
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Lab not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Start lab session
+      tags:
+      - Labs
+  /labs/session/active:
+    get:
+      description: Get user's current active lab session
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Active session details
+          schema:
+            $ref: '#/definitions/dto.ActiveSessionResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: No active session
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get active session
+      tags:
+      - Labs
+  /labs/session/history:
+    get:
+      description: Get user's lab session history
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Session history with pagination
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get session history
+      tags:
+      - Labs
+  /labs/slug/{slug}:
+    get:
+      description: Get detailed information about a specific lab by its slug
+      parameters:
+      - description: Lab Slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Lab details
+          schema:
+            $ref: '#/definitions/dto.LabDetailResponse'
+        "404":
+          description: Lab not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get lab details by slug
+      tags:
+      - Labs
   /leaderboard:
     get:
       description: Get leaderboard rankings (weekly, monthly, or all-time)
@@ -3598,6 +4549,20 @@ paths:
       summary: Get user stats
       tags:
       - Gamification
+  /ws/labs/{id}:
+    get:
+      description: Connect to WebSocket to receive real-time lab updates (sensor data,
+        queue updates, etc.)
+      parameters:
+      - description: Lab ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: WebSocket connection for lab
+      tags:
+      - Labs WebSocket
 securityDefinitions:
   Bearer:
     in: header

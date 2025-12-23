@@ -141,6 +141,17 @@ func RunMigrations() {
 				&models.EmailVerificationToken{},
 			},
 		},
+		{
+			Name: "Virtual Lab Module",
+			Models: []interface{}{
+				&models.Lab{},
+				&models.LabSession{},
+				&models.LabBooking{},
+				&models.LabQueue{},
+				&models.LabHardwareLog{},
+				&models.CodeCompilation{},
+			},
+		},
 	}
 
 	for _, migration := range migrations {
@@ -189,6 +200,38 @@ func createIndexes() {
 
 		// Leaderboard indexes
 		"CREATE INDEX IF NOT EXISTS idx_leaderboard_entries_rank ON leaderboard_entries(leaderboard_id, rank)",
+
+		// Lab indexes
+		"CREATE INDEX IF NOT EXISTS idx_labs_status ON labs(status)",
+		"CREATE INDEX IF NOT EXISTS idx_labs_platform ON labs(platform)",
+		"CREATE INDEX IF NOT EXISTS idx_labs_slug ON labs(slug)",
+		"CREATE INDEX IF NOT EXISTS idx_labs_current_user ON labs(current_user_id)",
+
+		// Lab session indexes
+		"CREATE INDEX IF NOT EXISTS idx_lab_sessions_lab ON lab_sessions(lab_id)",
+		"CREATE INDEX IF NOT EXISTS idx_lab_sessions_user ON lab_sessions(user_id)",
+		"CREATE INDEX IF NOT EXISTS idx_lab_sessions_status ON lab_sessions(status)",
+		"CREATE INDEX IF NOT EXISTS idx_lab_sessions_active ON lab_sessions(user_id, status) WHERE status = 'active'",
+
+		// Lab queue indexes
+		"CREATE INDEX IF NOT EXISTS idx_lab_queue_lab ON lab_queue(lab_id)",
+		"CREATE INDEX IF NOT EXISTS idx_lab_queue_user ON lab_queue(user_id)",
+		"CREATE INDEX IF NOT EXISTS idx_lab_queue_position ON lab_queue(lab_id, position)",
+		"CREATE UNIQUE INDEX IF NOT EXISTS idx_lab_queue_unique ON lab_queue(lab_id, user_id)",
+
+		// Lab booking indexes
+		"CREATE INDEX IF NOT EXISTS idx_lab_bookings_lab ON lab_bookings(lab_id)",
+		"CREATE INDEX IF NOT EXISTS idx_lab_bookings_user ON lab_bookings(user_id)",
+		"CREATE INDEX IF NOT EXISTS idx_lab_bookings_scheduled ON lab_bookings(scheduled_at)",
+
+		// Lab hardware log indexes
+		"CREATE INDEX IF NOT EXISTS idx_lab_hardware_logs_lab ON lab_hardware_logs(lab_id)",
+		"CREATE INDEX IF NOT EXISTS idx_lab_hardware_logs_session ON lab_hardware_logs(session_id)",
+		"CREATE INDEX IF NOT EXISTS idx_lab_hardware_logs_type ON lab_hardware_logs(event_type)",
+
+		// Code compilation indexes
+		"CREATE INDEX IF NOT EXISTS idx_code_compilations_session ON code_compilations(session_id)",
+		"CREATE INDEX IF NOT EXISTS idx_code_compilations_status ON code_compilations(status)",
 	}
 
 	for _, idx := range indexes {

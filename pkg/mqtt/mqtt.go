@@ -89,8 +89,12 @@ func InitMQTT() error {
 		})
 
 		MQTTClient = mqtt.NewClient(opts)
-		if token := MQTTClient.Connect(); token.Wait() && token.Error() != nil {
+		if token := MQTTClient.Connect(); token.WaitTimeout(5*time.Second) && token.Error() != nil {
 			initErr = token.Error()
+			log.Printf("❌ Failed to connect to VerneMQ: %v", initErr)
+			return
+		} else if token.Error() == nil && !IsConnected() {
+			initErr = fmt.Errorf("connection timed out")
 			log.Printf("❌ Failed to connect to VerneMQ: %v", initErr)
 			return
 		}

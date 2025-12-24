@@ -176,7 +176,7 @@ type ActiveSessionResponse struct {
 
 // SubmitCodeRequest for submitting code
 type SubmitCodeRequest struct {
-	SessionID string `json:"session_id" binding:"required,uuid"`
+	SessionID string `json:"session_id" binding:"omitempty,uuid"` // Optional - will use active session if not provided
 	Code      string `json:"code" binding:"required"`
 	Language  string `json:"language" binding:"required,oneof=arduino micropython c cpp"`
 	Filename  string `json:"filename"`

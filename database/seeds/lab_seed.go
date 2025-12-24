@@ -38,7 +38,7 @@ func SeedLabs(db *gorm.DB) error {
 	var count int64
 	db.Model(&models.Lab{}).Count(&count)
 	if count > 0 {
-		log.Println("📦 Labs already seeded, skipping...")
+		log.Println("✅ Labs data already exists (skipping seed). Proceeding...")
 		return nil
 	}
 

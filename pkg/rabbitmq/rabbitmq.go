@@ -81,7 +81,9 @@ func InitRabbitMQ() error {
 			config.User, config.Password, config.Host, config.Port, config.VHost)
 
 		var err error
-		conn, err = amqp.Dial(url)
+		conn, err = amqp.DialConfig(url, amqp.Config{
+			Dial: amqp.DefaultDial(5 * time.Second),
+		})
 		if err != nil {
 			initErr = fmt.Errorf("failed to connect to RabbitMQ: %v", err)
 			log.Printf("❌ %v", initErr)

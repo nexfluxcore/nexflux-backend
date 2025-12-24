@@ -11,6 +11,7 @@ import (
 	"nexfi-backend/utils"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -41,6 +42,11 @@ func (s *AuthService) Register(req dto.RegisterRequest) (*dto.AuthResponse, erro
 		return nil, errors.New("email already registered")
 	}
 
+	// Check if username exists
+	// if err := s.db.Where("username = ?", req.Username).First(&existing).Error; err == nil {
+	// 	return nil, errors.New("username already taken")
+	// }
+
 	// Hash password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
@@ -63,7 +69,15 @@ func (s *AuthService) Register(req dto.RegisterRequest) (*dto.AuthResponse, erro
 	}
 
 	if err := s.db.Create(&user).Error; err != nil {
-		return nil, err
+		// Handle duplicate key errors with user-friendly messages
+		errStr := err.Error()
+		if strings.Contains(errStr, "idx_users_email") || strings.Contains(errStr, "email") {
+			return nil, errors.New("email already registered")
+		}
+		if strings.Contains(errStr, "idx_users_username") || strings.Contains(errStr, "username") {
+			return nil, errors.New("username already taken")
+		}
+		return nil, errors.New("failed to create account, please try again")
 	}
 
 	// Generate tokens

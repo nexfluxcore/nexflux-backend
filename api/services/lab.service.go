@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -468,10 +469,23 @@ func (s *LabService) processNextInQueue(labID string) {
 
 // SubmitCode submits code for compilation and upload
 func (s *LabService) SubmitCode(labID, userID string, req dto.SubmitCodeRequest) (*dto.SubmitCodeResponse, error) {
-	// Verify session
-	session, err := s.repo.FindSessionByID(req.SessionID)
-	if err != nil {
-		return nil, errors.New("session not found")
+	var session *models.LabSession
+	var err error
+
+	// If SessionID is provided, use it; otherwise get user's active session
+	if req.SessionID != "" {
+		session, err = s.repo.FindSessionByID(req.SessionID)
+		if err != nil {
+			return nil, errors.New("session not found")
+		}
+	} else {
+		// Get user's active session for this lab
+		session, err = s.repo.FindActiveSessionByLab(labID)
+		if err != nil {
+			return nil, errors.New("no active session found for this lab")
+		}
+		// Use the found session ID
+		req.SessionID = session.ID
 	}
 
 	if session.UserID != userID {
@@ -760,8 +774,7 @@ func getSessionDuration() time.Duration {
 	return time.Duration(seconds) * time.Second
 }
 
-// generateUUID generates a UUID (simplified - in production use google/uuid)
+// generateUUID generates a proper UUID v4
 func generateUUID() string {
-	// Use the same UUID generation as the database
-	return fmt.Sprintf("%d", time.Now().UnixNano())
+	return uuid.New().String()
 }

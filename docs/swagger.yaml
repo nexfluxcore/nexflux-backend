@@ -1100,11 +1100,14 @@ definitions:
         minLength: 8
         type: string
       username:
+        maxLength: 30
+        minLength: 3
         type: string
     required:
     - email
     - name
     - password
+    - username
     type: object
   dto.ResetPasswordRequest:
     properties:
@@ -1231,11 +1234,11 @@ definitions:
         - cpp
         type: string
       session_id:
+        description: Optional - will use active session if not provided
         type: string
     required:
     - code
     - language
-    - session_id
     type: object
   dto.SubmitCodeResponse:
     properties:
@@ -1404,6 +1407,32 @@ definitions:
         type: string
       username:
         maxLength: 50
+        type: string
+    type: object
+  handlers.HealthResponse:
+    properties:
+      services:
+        items:
+          $ref: '#/definitions/handlers.ServiceStatus'
+        type: array
+      status:
+        description: '"healthy", "unhealthy", "degraded"'
+        type: string
+      timestamp:
+        type: string
+      version:
+        type: string
+    type: object
+  handlers.ServiceStatus:
+    properties:
+      latency:
+        type: string
+      message:
+        type: string
+      name:
+        type: string
+      status:
+        description: '"healthy", "unhealthy", "degraded"'
         type: string
     type: object
   handlers.UploadResponse:
@@ -2799,6 +2828,24 @@ paths:
       summary: Get video details
       tags:
       - Documentation
+  /health:
+    get:
+      description: Get the health status of all services including Database, Redis,
+        MQTT, RabbitMQ, LiveKit, and Storage
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: All services healthy
+          schema:
+            $ref: '#/definitions/handlers.HealthResponse'
+        "503":
+          description: One or more services unhealthy
+          schema:
+            $ref: '#/definitions/handlers.HealthResponse'
+      summary: Full health check endpoint
+      tags:
+      - Health
   /labs:
     get:
       consumes:
@@ -3645,6 +3692,21 @@ paths:
       summary: Mark all notifications as read
       tags:
       - Notifications
+  /ping:
+    get:
+      description: Quick health check that only returns OK
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Simple health check
+      tags:
+      - Health
   /projects:
     get:
       consumes:
@@ -4148,6 +4210,28 @@ paths:
       summary: Get project templates
       tags:
       - Projects
+  /ready:
+    get:
+      description: Check if the service is ready to accept traffic (all critical services
+        must be available)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ready
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "503":
+          description: Not Ready
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Readiness check
+      tags:
+      - Health
   /streak:
     get:
       description: Get user's current streak information and history

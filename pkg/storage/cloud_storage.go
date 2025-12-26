@@ -507,6 +507,33 @@ func GetStorageType() string {
 	return DefaultCloudStorage.storageType
 }
 
+// IsInitialized checks if storage is initialized
+func IsInitialized() bool {
+	return DefaultCloudStorage != nil
+}
+
+// CheckHealth performs a health check on the storage
+func CheckHealth() error {
+	if DefaultCloudStorage == nil {
+		return ErrStorageNotInit
+	}
+
+	if DefaultCloudStorage.storageType == StorageTypeMinio {
+		// Try to list buckets as health check
+		_, err := DefaultCloudStorage.client.ListBuckets(DefaultCloudStorage.ctx)
+		if err != nil {
+			return fmt.Errorf("MinIO health check failed: %w", err)
+		}
+	} else {
+		// Check if local directory is accessible
+		if _, err := os.Stat(DefaultCloudStorage.localBaseDir); os.IsNotExist(err) {
+			return fmt.Errorf("local storage directory not accessible: %w", err)
+		}
+	}
+
+	return nil
+}
+
 // InitStorage is an alias for InitCloudStorage (backward compatibility)
 func InitStorage() error {
 	return InitCloudStorage()

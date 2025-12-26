@@ -31,6 +31,23 @@ func InitRedis() {
 	}
 }
 
+// IsConnected checks if Redis client is connected
+func IsConnected() bool {
+	if RedisClient == nil {
+		return false
+	}
+	_, err := RedisClient.Ping(ctx).Result()
+	return err == nil
+}
+
+// Ping performs a health check ping to Redis
+func Ping() error {
+	if RedisClient == nil {
+		return fmt.Errorf("redis client not initialized")
+	}
+	return RedisClient.Ping(ctx).Err()
+}
+
 // ============================================
 // STRING OPERATIONS
 // ============================================

@@ -2113,6 +2113,32 @@ const docTemplate = `{
                 }
             }
         },
+        "/health": {
+            "get": {
+                "description": "Get the health status of all services including Database, Redis, MQTT, RabbitMQ, LiveKit, and Storage",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Full health check endpoint",
+                "responses": {
+                    "200": {
+                        "description": "All services healthy",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.HealthResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "One or more services unhealthy",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.HealthResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/labs": {
             "get": {
                 "description": "Get list of available labs with optional filters",
@@ -3417,6 +3443,29 @@ const docTemplate = `{
                 }
             }
         },
+        "/ping": {
+            "get": {
+                "description": "Quick health check that only returns OK",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Simple health check",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/projects": {
             "get": {
                 "security": [
@@ -4179,6 +4228,38 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/ready": {
+            "get": {
+                "description": "Check if the service is ready to accept traffic (all critical services must be available)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Readiness check",
+                "responses": {
+                    "200": {
+                        "description": "Ready",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Not Ready",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -6485,7 +6566,8 @@ const docTemplate = `{
             "required": [
                 "email",
                 "name",
-                "password"
+                "password",
+                "username"
             ],
             "properties": {
                 "email": {
@@ -6500,7 +6582,9 @@ const docTemplate = `{
                     "minLength": 8
                 },
                 "username": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 30,
+                    "minLength": 3
                 }
             }
         },
@@ -6678,8 +6762,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "code",
-                "language",
-                "session_id"
+                "language"
             ],
             "properties": {
                 "code": {
@@ -6698,6 +6781,7 @@ const docTemplate = `{
                     ]
                 },
                 "session_id": {
+                    "description": "Optional - will use active session if not provided",
                     "type": "string"
                 }
             }
@@ -6951,6 +7035,45 @@ const docTemplate = `{
                 "username": {
                     "type": "string",
                     "maxLength": 50
+                }
+            }
+        },
+        "handlers.HealthResponse": {
+            "type": "object",
+            "properties": {
+                "services": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handlers.ServiceStatus"
+                    }
+                },
+                "status": {
+                    "description": "\"healthy\", \"unhealthy\", \"degraded\"",
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.ServiceStatus": {
+            "type": "object",
+            "properties": {
+                "latency": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "description": "\"healthy\", \"unhealthy\", \"degraded\"",
+                    "type": "string"
                 }
             }
         },

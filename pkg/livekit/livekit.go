@@ -66,6 +66,11 @@ func GetHost() string {
 	return host
 }
 
+// IsInitialized checks if LiveKit client is initialized
+func IsInitialized() bool {
+	return roomSvc != nil && apiKey != "" && apiSecret != ""
+}
+
 // ============================================
 // Token Generation
 // ============================================

@@ -13,6 +13,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 	oauthHandler := handlers.NewOAuthHandler()
 	authHandler := handlers.NewAuthHandler()
 	healthCheckHandler := handlers.NewHealthCheckHandler()
+	healthHandler := handlers.NewHealthHandler() // New comprehensive health handler
 	userHandler := handlers.NewUserHandler(nil)
 	projectHandler := handlers.NewProjectHandler(db)
 	componentHandler := handlers.NewComponentHandler(db)
@@ -31,6 +32,13 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 	router.Static("/uploads", "./uploads")
 
 	// ========================================
+	// ROOT HEALTH ENDPOINTS (No API prefix, for monitoring tools)
+	// ========================================
+	router.GET("/health", healthHandler.FullHealthCheck)
+	router.GET("/ping", healthHandler.SimpleHealth)
+	router.GET("/ready", healthHandler.ReadyCheck)
+
+	// ========================================
 	// WEBSOCKET ROUTES (No auth required for connection, auth checked inside)
 	// ========================================
 	ws := router.Group("/ws")
@@ -41,7 +49,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 	// Base API group
 	apiV1 := router.Group("/api/v1")
 	{
-		// Health check route
+		// Health check route (legacy, uses simple handler)
 		apiV1.GET("/health", healthCheckHandler.HealthCheck)
 
 		// Base route

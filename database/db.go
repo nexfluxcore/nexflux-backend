@@ -152,6 +152,29 @@ func RunMigrations() {
 				&models.CodeCompilation{},
 			},
 		},
+		{
+			Name: "Project Progress & XP System",
+			Models: []interface{}{
+				&models.ProjectProgress{},
+				&models.ProjectMilestone{},
+				&models.UserXPTransaction{},
+				&models.ProjectSimulationResult{},
+			},
+		},
+		{
+			Name: "Circuit Simulator",
+			Models: []interface{}{
+				&models.Circuit{},
+				&models.CircuitTemplate{},
+			},
+		},
+		{
+			Name: "Simulation Management",
+			Models: []interface{}{
+				&models.Simulation{},
+				&models.SimulationRun{},
+			},
+		},
 	}
 
 	for _, migration := range migrations {

@@ -258,6 +258,59 @@ definitions:
     - current_password
     - new_password
     type: object
+  dto.CircuitDetailResponse:
+    properties:
+      components_count:
+        type: integer
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      is_public:
+        type: boolean
+      is_template:
+        type: boolean
+      name:
+        type: string
+      project_id:
+        type: string
+      project_name:
+        type: string
+      schema_data:
+        items:
+          type: integer
+        type: array
+      thumbnail_url:
+        type: string
+      updated_at:
+        type: string
+      wires_count:
+        type: integer
+    type: object
+  dto.CircuitExportResponse:
+    properties:
+      content:
+        type: string
+      filename:
+        type: string
+      format:
+        type: string
+    type: object
+  dto.CircuitThumbnailRequest:
+    properties:
+      image_data:
+        description: base64 encoded
+        type: string
+    required:
+    - image_data
+    type: object
+  dto.CircuitThumbnailResponse:
+    properties:
+      thumbnail_url:
+        type: string
+    type: object
   dto.CollaboratorResponse:
     properties:
       accepted_at:
@@ -283,6 +336,32 @@ definitions:
         type: string
       uploaded_at:
         type: string
+    type: object
+  dto.CompleteProjectResponse:
+    properties:
+      achievements_unlocked:
+        items:
+          type: string
+        type: array
+      completed_at:
+        type: string
+      level_up:
+        $ref: '#/definitions/dto.LevelUpInfo'
+      total_xp:
+        type: integer
+      xp_earned:
+        type: integer
+    type: object
+  dto.ComponentProgress:
+    properties:
+      complete:
+        type: boolean
+      earned:
+        type: integer
+      percentage:
+        type: integer
+      weight:
+        type: integer
     type: object
   dto.ComponentRequestCreateRequest:
     properties:
@@ -419,6 +498,53 @@ definitions:
         type: string
       success:
         type: boolean
+    type: object
+  dto.CreateCircuitRequest:
+    properties:
+      description:
+        type: string
+      name:
+        maxLength: 255
+        type: string
+      project_id:
+        type: string
+      schema_data:
+        items:
+          type: integer
+        type: array
+    required:
+    - name
+    - schema_data
+    type: object
+  dto.CreateSimulationRequest:
+    properties:
+      description:
+        type: string
+      name:
+        maxLength: 255
+        type: string
+      project_id:
+        type: string
+      schema_data:
+        items:
+          type: integer
+        type: array
+      simulation_settings:
+        items:
+          type: integer
+        type: array
+      type:
+        enum:
+        - Basic Electronics
+        - IoT
+        - Power Electronics
+        - Wireless
+        - Renewable Energy
+        - Audio
+        - Digital Logic
+        type: string
+    required:
+    - name
     type: object
   dto.DailyChallengeResponse:
     properties:
@@ -655,6 +781,21 @@ definitions:
     required:
     - email
     type: object
+  dto.GetProgressResponse:
+    properties:
+      breakdown:
+        $ref: '#/definitions/dto.ProgressBreakdown'
+      milestones:
+        items:
+          $ref: '#/definitions/dto.MilestoneInfo'
+        type: array
+      next_action:
+        type: string
+      progress:
+        type: integer
+      total_xp_earned:
+        type: integer
+    type: object
   dto.HardwareConfig:
     properties:
       baud_rate:
@@ -782,6 +923,15 @@ definitions:
       type:
         type: string
     type: object
+  dto.LevelUpInfo:
+    properties:
+      new_level:
+        type: integer
+      old_level:
+        type: integer
+      xp_to_next:
+        type: integer
+    type: object
   dto.LoginRequest:
     properties:
       email:
@@ -791,6 +941,17 @@ definitions:
     required:
     - email
     - password
+    type: object
+  dto.MilestoneInfo:
+    properties:
+      id:
+        type: string
+      type:
+        type: string
+      unlocked_at:
+        type: string
+      xp_earned:
+        type: integer
     type: object
   dto.NotificationListResponse:
     properties:
@@ -855,6 +1016,24 @@ definitions:
         type: string
       start:
         type: string
+    type: object
+  dto.ProgressBreakdown:
+    properties:
+      code:
+        $ref: '#/definitions/dto.ComponentProgress'
+      schema:
+        $ref: '#/definitions/dto.ComponentProgress'
+      simulation:
+        $ref: '#/definitions/dto.ComponentProgress'
+      verification:
+        $ref: '#/definitions/dto.ComponentProgress'
+    type: object
+  dto.ProgressUpdateInfo:
+    properties:
+      new:
+        type: integer
+      old:
+        type: integer
     type: object
   dto.ProjectComponentResponse:
     properties:
@@ -965,6 +1144,29 @@ definitions:
         type: string
       xp_reward:
         type: integer
+    type: object
+  dto.ProjectProgressUpdateRequest:
+    properties:
+      action:
+        enum:
+        - save
+        - run
+        - verify
+        type: string
+      component:
+        enum:
+        - schema
+        - code
+        - simulation
+        - verification
+        type: string
+      data:
+        items:
+          type: integer
+        type: array
+    required:
+    - action
+    - component
     type: object
   dto.ProjectResponse:
     properties:
@@ -1120,6 +1322,141 @@ definitions:
     - password
     - token
     type: object
+  dto.RunSimulationRequest:
+    properties:
+      duration_ms:
+        maximum: 60000
+        minimum: 100
+        type: integer
+      speed_multiplier:
+        maximum: 10
+        minimum: 0.1
+        type: number
+    type: object
+  dto.RunSimulationRequestDTO:
+    properties:
+      duration_ms:
+        maximum: 300000
+        minimum: 100
+        type: integer
+      settings_override:
+        items:
+          type: integer
+        type: array
+    type: object
+  dto.RunSimulationResponse:
+    properties:
+      progress_update:
+        $ref: '#/definitions/dto.ProgressUpdateInfo'
+      results:
+        $ref: '#/definitions/dto.SimulationResults'
+      simulation_id:
+        type: string
+      status:
+        description: success, failed, timeout
+        type: string
+      xp_earned:
+        type: integer
+    type: object
+  dto.RunSimulationResponseDTO:
+    properties:
+      run_id:
+        type: string
+      started_at:
+        type: string
+      status:
+        type: string
+    type: object
+  dto.SaveCodeRequest:
+    properties:
+      content:
+        type: string
+      filename:
+        type: string
+      language:
+        enum:
+        - arduino
+        - micropython
+        - c
+        - cpp
+        - python
+        type: string
+    required:
+    - content
+    - language
+    type: object
+  dto.SaveCodeResponse:
+    properties:
+      char_count:
+        type: integer
+      is_first_save:
+        type: boolean
+      progress:
+        type: integer
+      progress_change:
+        type: integer
+      success:
+        type: boolean
+      xp_earned:
+        type: integer
+    type: object
+  dto.SaveSchemaRequest:
+    properties:
+      canvas_settings:
+        items:
+          type: integer
+        type: array
+      components:
+        items:
+          type: integer
+        type: array
+      connections:
+        items:
+          type: integer
+        type: array
+    required:
+    - components
+    type: object
+  dto.SaveSchemaResponse:
+    properties:
+      is_first_save:
+        type: boolean
+      progress:
+        type: integer
+      progress_change:
+        type: integer
+      success:
+        type: boolean
+      xp_earned:
+        type: integer
+    type: object
+  dto.SaveSimulationResultRequest:
+    properties:
+      duration_ms:
+        type: integer
+      errors:
+        items:
+          type: integer
+        type: array
+      result_data:
+        items:
+          type: integer
+        type: array
+      warnings:
+        items:
+          type: integer
+        type: array
+    required:
+    - duration_ms
+    - result_data
+    type: object
+  dto.SaveSimulationResultResponse:
+    properties:
+      run_id:
+        type: string
+      xp_earned:
+        type: integer
+    type: object
   dto.SensorDataResponse:
     properties:
       sensors:
@@ -1155,6 +1492,91 @@ definitions:
       success:
         type: boolean
     type: object
+  dto.SimulationDetailResponse:
+    properties:
+      components_count:
+        type: integer
+      created_at:
+        type: string
+      description:
+        type: string
+      error_message:
+        type: string
+      id:
+        type: string
+      last_result:
+        items:
+          type: integer
+        type: array
+      last_run_at:
+        type: string
+      name:
+        type: string
+      project_id:
+        type: string
+      project_name:
+        type: string
+      run_count:
+        type: integer
+      schema_data:
+        items:
+          type: integer
+        type: array
+      simulation_settings:
+        items:
+          type: integer
+        type: array
+      status:
+        type: string
+      thumbnail_url:
+        type: string
+      total_runtime_ms:
+        type: integer
+      type:
+        type: string
+      updated_at:
+        type: string
+      wires_count:
+        type: integer
+    type: object
+  dto.SimulationResults:
+    properties:
+      errors:
+        items:
+          type: string
+        type: array
+      output_data:
+        items:
+          type: integer
+        type: array
+      warnings:
+        items:
+          type: string
+        type: array
+    type: object
+  dto.SimulationStatsResponse:
+    properties:
+      by_type:
+        additionalProperties:
+          type: integer
+        type: object
+      completed:
+        type: integer
+      error:
+        type: integer
+      paused:
+        type: integer
+      running_now:
+        type: integer
+      simulations_this_week:
+        type: integer
+      success_rate:
+        type: number
+      total_runtime_hours:
+        type: number
+      total_simulations:
+        type: integer
+    type: object
   dto.StartSessionResponse:
     properties:
       expires_at:
@@ -1168,6 +1590,13 @@ definitions:
       room_name:
         type: string
       session_id:
+        type: string
+    type: object
+  dto.StopSimulationResponse:
+    properties:
+      duration_ms:
+        type: integer
+      status:
         type: string
     type: object
   dto.StreakInfo:
@@ -1247,6 +1676,20 @@ definitions:
       status:
         type: string
     type: object
+  dto.UpdateCircuitRequest:
+    properties:
+      description:
+        type: string
+      is_public:
+        type: boolean
+      name:
+        maxLength: 255
+        type: string
+      schema_data:
+        items:
+          type: integer
+        type: array
+    type: object
   dto.UpdateProgressRequest:
     properties:
       current_step:
@@ -1259,6 +1702,46 @@ definitions:
       time_spent_minutes:
         minimum: 0
         type: integer
+    type: object
+  dto.UpdateProgressResponse:
+    properties:
+      breakdown:
+        $ref: '#/definitions/dto.ProgressBreakdown'
+      milestones_unlocked:
+        items:
+          type: string
+        type: array
+      progress:
+        type: integer
+      progress_change:
+        type: integer
+      xp_earned:
+        type: integer
+    type: object
+  dto.UpdateSimulationRequest:
+    properties:
+      description:
+        type: string
+      name:
+        maxLength: 255
+        type: string
+      schema_data:
+        items:
+          type: integer
+        type: array
+      simulation_settings:
+        items:
+          type: integer
+        type: array
+      type:
+        type: string
+    type: object
+  dto.UseTemplateRequest:
+    properties:
+      name:
+        type: string
+      project_id:
+        type: string
     type: object
   dto.UserAuthInfo:
     properties:
@@ -2207,6 +2690,351 @@ paths:
       summary: Get my challenge progress
       tags:
       - Challenges
+  /circuits:
+    get:
+      description: Get list of current user's circuits
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Filter by project ID
+        in: query
+        name: project_id
+        type: string
+      - description: Search by name
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of circuits
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: List user's circuits
+      tags:
+      - Circuits
+    post:
+      consumes:
+      - application/json
+      description: Create a new circuit
+      parameters:
+      - description: Circuit data
+        in: body
+        name: circuit
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateCircuitRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Circuit created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Create new circuit
+      tags:
+      - Circuits
+  /circuits/{id}:
+    delete:
+      description: Delete a circuit
+      parameters:
+      - description: Circuit ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Circuit deleted
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Access denied
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Circuit not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Delete circuit
+      tags:
+      - Circuits
+    get:
+      description: Get detailed information about a circuit
+      parameters:
+      - description: Circuit ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Circuit details
+          schema:
+            $ref: '#/definitions/dto.CircuitDetailResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Circuit not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get circuit detail
+      tags:
+      - Circuits
+    put:
+      consumes:
+      - application/json
+      description: Update an existing circuit
+      parameters:
+      - description: Circuit ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Circuit data
+        in: body
+        name: circuit
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateCircuitRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Circuit updated
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Access denied
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Update circuit
+      tags:
+      - Circuits
+  /circuits/{id}/duplicate:
+    post:
+      description: Create a copy of an existing circuit
+      parameters:
+      - description: Circuit ID to duplicate
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "201":
+          description: Circuit duplicated
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Circuit not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Duplicate circuit
+      tags:
+      - Circuits
+  /circuits/{id}/export:
+    get:
+      description: Export circuit in different formats (json, spice)
+      parameters:
+      - description: Circuit ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - default: json
+        description: 'Export format: json, spice'
+        in: query
+        name: format
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Export data
+          schema:
+            $ref: '#/definitions/dto.CircuitExportResponse'
+      security:
+      - Bearer: []
+      summary: Export circuit
+      tags:
+      - Circuits
+  /circuits/{id}/thumbnail:
+    post:
+      consumes:
+      - application/json
+      description: Upload a thumbnail image for a circuit
+      parameters:
+      - description: Circuit ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Base64 image data
+        in: body
+        name: thumbnail
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CircuitThumbnailRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Thumbnail uploaded
+          schema:
+            $ref: '#/definitions/dto.CircuitThumbnailResponse'
+      security:
+      - Bearer: []
+      summary: Upload circuit thumbnail
+      tags:
+      - Circuits
+  /circuits/templates:
+    get:
+      description: Get list of available circuit templates
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Filter by category
+        in: query
+        name: category
+        type: string
+      - description: Filter by difficulty
+        in: query
+        name: difficulty
+        type: string
+      - description: Search by name
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of templates
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: List circuit templates
+      tags:
+      - Circuits
+  /circuits/templates/{id}/use:
+    post:
+      consumes:
+      - application/json
+      description: Clone a template to user's circuits
+      parameters:
+      - description: Template ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Optional name and project ID
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UseTemplateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Template applied
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Use circuit template
+      tags:
+      - Circuits
   /components:
     get:
       description: Get list of electronic components with optional filters
@@ -3950,6 +4778,110 @@ paths:
       summary: Update project
       tags:
       - Projects
+  /projects/{id}/code:
+    get:
+      description: Get the code/firmware data for a project
+      parameters:
+      - description: Project ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Code data
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Access denied
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Project not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get project code data
+      tags:
+      - Projects
+    put:
+      consumes:
+      - application/json
+      description: Save code/firmware data for the project
+      parameters:
+      - description: Project ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Code data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SaveCodeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Code saved
+          schema:
+            $ref: '#/definitions/dto.SaveCodeResponse'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Access denied
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Project not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Save project code
+      tags:
+      - Projects
   /projects/{id}/collaborators:
     get:
       description: Get list of collaborators for a specific project
@@ -4103,6 +5035,57 @@ paths:
       summary: Remove collaborator from project
       tags:
       - Projects
+  /projects/{id}/complete:
+    post:
+      description: Mark project as complete and award completion XP
+      parameters:
+      - description: Project ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Project completed
+          schema:
+            $ref: '#/definitions/dto.CompleteProjectResponse'
+        "400":
+          description: Project not ready for completion
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Access denied
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Project not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Complete project
+      tags:
+      - Projects
   /projects/{id}/duplicate:
     post:
       description: Create a copy of an existing project (including components)
@@ -4178,6 +5161,274 @@ paths:
       summary: Toggle project favorite
       tags:
       - Projects
+  /projects/{id}/progress:
+    get:
+      description: Get detailed progress breakdown for a project including milestones
+        and XP earned
+      parameters:
+      - description: Project ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Progress details
+          schema:
+            $ref: '#/definitions/dto.GetProgressResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Access denied
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Project not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get project progress detail
+      tags:
+      - Projects
+    put:
+      consumes:
+      - application/json
+      description: Update progress for a specific component (schema, code, simulation,
+        verification)
+      parameters:
+      - description: Project ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Progress update data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProjectProgressUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Progress updated
+          schema:
+            $ref: '#/definitions/dto.UpdateProgressResponse'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Access denied
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Project not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Update project progress
+      tags:
+      - Projects
+  /projects/{id}/schema:
+    get:
+      description: Get the circuit schema data for a project
+      parameters:
+      - description: Project ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Schema data
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Access denied
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Project not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get project schema data
+      tags:
+      - Projects
+    put:
+      consumes:
+      - application/json
+      description: Save circuit schema data including components and connections
+      parameters:
+      - description: Project ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Schema data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SaveSchemaRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Schema saved
+          schema:
+            $ref: '#/definitions/dto.SaveSchemaResponse'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Access denied
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Project not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Save project schema/circuit data
+      tags:
+      - Projects
+  /projects/{id}/simulate:
+    post:
+      consumes:
+      - application/json
+      description: Execute simulation for the project circuit and code
+      parameters:
+      - description: Project ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Simulation parameters
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RunSimulationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Simulation results
+          schema:
+            $ref: '#/definitions/dto.RunSimulationResponse'
+        "400":
+          description: Invalid input or missing schema/code
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Access denied
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Project not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Run project simulation
+      tags:
+      - Projects
   /projects/templates:
     get:
       description: Get list of public project templates that can be used as starting
@@ -4232,6 +5483,376 @@ paths:
       summary: Readiness check
       tags:
       - Health
+  /simulations:
+    get:
+      description: Get list of current user's simulations
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Filter by status
+        in: query
+        name: status
+        type: string
+      - description: Filter by type
+        in: query
+        name: type
+        type: string
+      - description: Filter by project ID
+        in: query
+        name: project_id
+        type: string
+      - description: Search by name
+        in: query
+        name: search
+        type: string
+      - default: created_at
+        description: Sort by field
+        in: query
+        name: sort
+        type: string
+      - default: desc
+        description: Sort order
+        in: query
+        name: order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of simulations
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: List user's simulations
+      tags:
+      - Simulations
+    post:
+      consumes:
+      - application/json
+      description: Create a new simulation
+      parameters:
+      - description: Simulation data
+        in: body
+        name: simulation
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateSimulationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Simulation created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Create new simulation
+      tags:
+      - Simulations
+  /simulations/{id}:
+    delete:
+      description: Delete a simulation
+      parameters:
+      - description: Simulation ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Simulation deleted
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Access denied
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Simulation not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Delete simulation
+      tags:
+      - Simulations
+    get:
+      description: Get detailed information about a simulation
+      parameters:
+      - description: Simulation ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Simulation details
+          schema:
+            $ref: '#/definitions/dto.SimulationDetailResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Simulation not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get simulation detail
+      tags:
+      - Simulations
+    put:
+      consumes:
+      - application/json
+      description: Update an existing simulation
+      parameters:
+      - description: Simulation ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Simulation data
+        in: body
+        name: simulation
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateSimulationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Simulation updated
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Access denied
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Update simulation
+      tags:
+      - Simulations
+  /simulations/{id}/result:
+    post:
+      consumes:
+      - application/json
+      description: Save simulation result from frontend
+      parameters:
+      - description: Simulation ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Result data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SaveSimulationResultRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Result saved
+          schema:
+            $ref: '#/definitions/dto.SaveSimulationResultResponse'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Simulation not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Save simulation result
+      tags:
+      - Simulations
+  /simulations/{id}/run:
+    post:
+      consumes:
+      - application/json
+      description: Start a new simulation run
+      parameters:
+      - description: Simulation ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Run parameters
+        in: body
+        name: body
+        schema:
+          $ref: '#/definitions/dto.RunSimulationRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Simulation started
+          schema:
+            $ref: '#/definitions/dto.RunSimulationResponseDTO'
+        "400":
+          description: Already running
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Simulation not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Run simulation
+      tags:
+      - Simulations
+  /simulations/{id}/runs:
+    get:
+      description: Get run history for a simulation
+      parameters:
+      - description: Simulation ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Run history
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Simulation not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get simulation run history
+      tags:
+      - Simulations
+  /simulations/{id}/stop:
+    post:
+      description: Stop a running simulation
+      parameters:
+      - description: Simulation ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Simulation stopped
+          schema:
+            $ref: '#/definitions/dto.StopSimulationResponse'
+        "404":
+          description: Simulation not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Stop simulation
+      tags:
+      - Simulations
+  /simulations/stats:
+    get:
+      description: Get aggregated simulation statistics for current user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Simulation statistics
+          schema:
+            $ref: '#/definitions/dto.SimulationStatsResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get simulation statistics
+      tags:
+      - Simulations
   /streak:
     get:
       description: Get user's current streak information and history

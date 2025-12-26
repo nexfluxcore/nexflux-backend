@@ -16,6 +16,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 	healthHandler := handlers.NewHealthHandler() // New comprehensive health handler
 	userHandler := handlers.NewUserHandler(nil)
 	projectHandler := handlers.NewProjectHandler(db)
+	projectProgressHandler := handlers.NewProjectProgressHandler(db) // Project progress & XP system
 	componentHandler := handlers.NewComponentHandler(db)
 	challengeHandler := handlers.NewChallengeHandler(db)
 	notificationHandler := handlers.NewNotificationHandler(db)
@@ -24,6 +25,8 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 	uploadHandler := handlers.NewUploadHandler()
 	labHandler := handlers.NewLabHandler(db)
 	labWSHandler := handlers.NewLabWSHandler(db)
+	circuitHandler := handlers.NewCircuitHandler(db)       // Circuit Simulator
+	simulationHandler := handlers.NewSimulationHandler(db) // Simulation Management
 
 	// Apply CORS middleware globally
 	router.Use(middleware.CORSMiddleware())
@@ -173,6 +176,16 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 				projects.GET("/:id/collaborators", projectHandler.GetCollaborators)
 				projects.POST("/:id/collaborators", projectHandler.AddCollaborator)
 				projects.DELETE("/:id/collaborators/:userId", projectHandler.RemoveCollaborator)
+
+				// Project Progress & Studio endpoints
+				projects.GET("/:id/progress", projectProgressHandler.GetProgress)
+				projects.PUT("/:id/progress", projectProgressHandler.UpdateProgress)
+				projects.GET("/:id/schema", projectProgressHandler.GetSchemaData)
+				projects.PUT("/:id/schema", projectProgressHandler.SaveSchema)
+				projects.GET("/:id/code", projectProgressHandler.GetCodeData)
+				projects.PUT("/:id/code", projectProgressHandler.SaveCode)
+				projects.POST("/:id/simulate", projectProgressHandler.RunSimulation)
+				projects.POST("/:id/complete", projectProgressHandler.CompleteProject)
 			}
 
 			// ======== COMPONENT ROUTES ========
@@ -249,6 +262,36 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 				labs.GET("/:id/sensors", labHandler.GetSensors)
 				labs.POST("/:id/actuators/control", labHandler.ControlActuator)
 				labs.POST("/:id/serial", labHandler.SendSerialCommand)
+			}
+
+			// ======== CIRCUIT ROUTES ========
+			circuits := protected.Group("/circuits")
+			{
+				circuits.GET("", circuitHandler.ListCircuits)
+				circuits.POST("", circuitHandler.CreateCircuit)
+				circuits.GET("/templates", circuitHandler.ListTemplates)
+				circuits.POST("/templates/:id/use", circuitHandler.UseTemplate)
+				circuits.GET("/:id", circuitHandler.GetCircuit)
+				circuits.PUT("/:id", circuitHandler.UpdateCircuit)
+				circuits.DELETE("/:id", circuitHandler.DeleteCircuit)
+				circuits.POST("/:id/duplicate", circuitHandler.DuplicateCircuit)
+				circuits.POST("/:id/thumbnail", circuitHandler.UploadThumbnail)
+				circuits.GET("/:id/export", circuitHandler.ExportCircuit)
+			}
+
+			// ======== SIMULATION ROUTES ========
+			simulations := protected.Group("/simulations")
+			{
+				simulations.GET("", simulationHandler.ListSimulations)
+				simulations.POST("", simulationHandler.CreateSimulation)
+				simulations.GET("/stats", simulationHandler.GetStats)
+				simulations.GET("/:id", simulationHandler.GetSimulation)
+				simulations.PUT("/:id", simulationHandler.UpdateSimulation)
+				simulations.DELETE("/:id", simulationHandler.DeleteSimulation)
+				simulations.POST("/:id/run", simulationHandler.RunSimulation)
+				simulations.POST("/:id/stop", simulationHandler.StopSimulation)
+				simulations.GET("/:id/runs", simulationHandler.GetRuns)
+				simulations.POST("/:id/result", simulationHandler.SaveResult)
 			}
 		}
 	}

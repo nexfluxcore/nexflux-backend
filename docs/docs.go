@@ -1168,6 +1168,543 @@ const docTemplate = `{
                 }
             }
         },
+        "/circuits": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get list of current user's circuits",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Circuits"
+                ],
+                "summary": "List user's circuits",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by project ID",
+                        "name": "project_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search by name",
+                        "name": "search",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of circuits",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Create a new circuit",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Circuits"
+                ],
+                "summary": "Create new circuit",
+                "parameters": [
+                    {
+                        "description": "Circuit data",
+                        "name": "circuit",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateCircuitRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Circuit created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/circuits/templates": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get list of available circuit templates",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Circuits"
+                ],
+                "summary": "List circuit templates",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by category",
+                        "name": "category",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by difficulty",
+                        "name": "difficulty",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search by name",
+                        "name": "search",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of templates",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/circuits/templates/{id}/use": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Clone a template to user's circuits",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Circuits"
+                ],
+                "summary": "Use circuit template",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Template ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Optional name and project ID",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UseTemplateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Template applied",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/circuits/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get detailed information about a circuit",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Circuits"
+                ],
+                "summary": "Get circuit detail",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Circuit ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Circuit details",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CircuitDetailResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Circuit not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Update an existing circuit",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Circuits"
+                ],
+                "summary": "Update circuit",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Circuit ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Circuit data",
+                        "name": "circuit",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateCircuitRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Circuit updated",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access denied",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Delete a circuit",
+                "tags": [
+                    "Circuits"
+                ],
+                "summary": "Delete circuit",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Circuit ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Circuit deleted",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access denied",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Circuit not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/circuits/{id}/duplicate": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Create a copy of an existing circuit",
+                "tags": [
+                    "Circuits"
+                ],
+                "summary": "Duplicate circuit",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Circuit ID to duplicate",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Circuit duplicated",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Circuit not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/circuits/{id}/export": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Export circuit in different formats (json, spice)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Circuits"
+                ],
+                "summary": "Export circuit",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Circuit ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "json",
+                        "description": "Export format: json, spice",
+                        "name": "format",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Export data",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CircuitExportResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/circuits/{id}/thumbnail": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Upload a thumbnail image for a circuit",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Circuits"
+                ],
+                "summary": "Upload circuit thumbnail",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Circuit ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Base64 image data",
+                        "name": "thumbnail",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CircuitThumbnailRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Thumbnail uploaded",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CircuitThumbnailResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/components": {
             "get": {
                 "security": [
@@ -3886,6 +4423,166 @@ const docTemplate = `{
                 }
             }
         },
+        "/projects/{id}/code": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get the code/firmware data for a project",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Get project code data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Project ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Code data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access denied",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Save code/firmware data for the project",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Save project code",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Project ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Code data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SaveCodeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Code saved",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SaveCodeResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access denied",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/projects/{id}/collaborators": {
             "get": {
                 "security": [
@@ -4121,6 +4818,85 @@ const docTemplate = `{
                 }
             }
         },
+        "/projects/{id}/complete": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Mark project as complete and award completion XP",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Complete project",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Project ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Project completed",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CompleteProjectResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Project not ready for completion",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access denied",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/projects/{id}/duplicate": {
             "post": {
                 "security": [
@@ -4238,6 +5014,416 @@ const docTemplate = `{
                 }
             }
         },
+        "/projects/{id}/progress": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get detailed progress breakdown for a project including milestones and XP earned",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Get project progress detail",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Project ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Progress details",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GetProgressResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access denied",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Update progress for a specific component (schema, code, simulation, verification)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Update project progress",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Project ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Progress update data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProjectProgressUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Progress updated",
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateProgressResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access denied",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/projects/{id}/schema": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get the circuit schema data for a project",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Get project schema data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Project ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Schema data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access denied",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Save circuit schema data including components and connections",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Save project schema/circuit data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Project ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Schema data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SaveSchemaRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Schema saved",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SaveSchemaResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access denied",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/projects/{id}/simulate": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Execute simulation for the project circuit and code",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Run project simulation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Project ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Simulation parameters",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.RunSimulationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Simulation results",
+                        "schema": {
+                            "$ref": "#/definitions/dto.RunSimulationResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input or missing schema/code",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access denied",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/ready": {
             "get": {
                 "description": "Check if the service is ready to accept traffic (all critical services must be available)",
@@ -4260,6 +5446,582 @@ const docTemplate = `{
                     },
                     "503": {
                         "description": "Not Ready",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/simulations": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get list of current user's simulations",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Simulations"
+                ],
+                "summary": "List user's simulations",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by status",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by type",
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by project ID",
+                        "name": "project_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search by name",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "created_at",
+                        "description": "Sort by field",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "desc",
+                        "description": "Sort order",
+                        "name": "order",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of simulations",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Create a new simulation",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Simulations"
+                ],
+                "summary": "Create new simulation",
+                "parameters": [
+                    {
+                        "description": "Simulation data",
+                        "name": "simulation",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateSimulationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Simulation created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/simulations/stats": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get aggregated simulation statistics for current user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Simulations"
+                ],
+                "summary": "Get simulation statistics",
+                "responses": {
+                    "200": {
+                        "description": "Simulation statistics",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SimulationStatsResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/simulations/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get detailed information about a simulation",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Simulations"
+                ],
+                "summary": "Get simulation detail",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Simulation ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Simulation details",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SimulationDetailResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Simulation not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Update an existing simulation",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Simulations"
+                ],
+                "summary": "Update simulation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Simulation ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Simulation data",
+                        "name": "simulation",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateSimulationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Simulation updated",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access denied",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Delete a simulation",
+                "tags": [
+                    "Simulations"
+                ],
+                "summary": "Delete simulation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Simulation ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Simulation deleted",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access denied",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Simulation not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/simulations/{id}/result": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Save simulation result from frontend",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Simulations"
+                ],
+                "summary": "Save simulation result",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Simulation ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Result data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SaveSimulationResultRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Result saved",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SaveSimulationResultResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Simulation not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/simulations/{id}/run": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Start a new simulation run",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Simulations"
+                ],
+                "summary": "Run simulation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Simulation ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Run parameters",
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/dto.RunSimulationRequestDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Simulation started",
+                        "schema": {
+                            "$ref": "#/definitions/dto.RunSimulationResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Already running",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Simulation not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/simulations/{id}/runs": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get run history for a simulation",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Simulations"
+                ],
+                "summary": "Get simulation run history",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Simulation ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Run history",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Simulation not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/simulations/{id}/stop": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Stop a running simulation",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Simulations"
+                ],
+                "summary": "Stop simulation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Simulation ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Simulation stopped",
+                        "schema": {
+                            "$ref": "#/definitions/dto.StopSimulationResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Simulation not found",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -5304,6 +7066,87 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.CircuitDetailResponse": {
+            "type": "object",
+            "properties": {
+                "components_count": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_public": {
+                    "type": "boolean"
+                },
+                "is_template": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "project_id": {
+                    "type": "string"
+                },
+                "project_name": {
+                    "type": "string"
+                },
+                "schema_data": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "thumbnail_url": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "wires_count": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.CircuitExportResponse": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "filename": {
+                    "type": "string"
+                },
+                "format": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.CircuitThumbnailRequest": {
+            "type": "object",
+            "required": [
+                "image_data"
+            ],
+            "properties": {
+                "image_data": {
+                    "description": "base64 encoded",
+                    "type": "string"
+                }
+            }
+        },
+        "dto.CircuitThumbnailResponse": {
+            "type": "object",
+            "properties": {
+                "thumbnail_url": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.CollaboratorResponse": {
             "type": "object",
             "properties": {
@@ -5341,6 +7184,46 @@ const docTemplate = `{
                 },
                 "uploaded_at": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.CompleteProjectResponse": {
+            "type": "object",
+            "properties": {
+                "achievements_unlocked": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "completed_at": {
+                    "type": "string"
+                },
+                "level_up": {
+                    "$ref": "#/definitions/dto.LevelUpInfo"
+                },
+                "total_xp": {
+                    "type": "integer"
+                },
+                "xp_earned": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ComponentProgress": {
+            "type": "object",
+            "properties": {
+                "complete": {
+                    "type": "boolean"
+                },
+                "earned": {
+                    "type": "integer"
+                },
+                "percentage": {
+                    "type": "integer"
+                },
+                "weight": {
+                    "type": "integer"
                 }
             }
         },
@@ -5543,6 +7426,73 @@ const docTemplate = `{
                 },
                 "success": {
                     "type": "boolean"
+                }
+            }
+        },
+        "dto.CreateCircuitRequest": {
+            "type": "object",
+            "required": [
+                "name",
+                "schema_data"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "project_id": {
+                    "type": "string"
+                },
+                "schema_data": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "dto.CreateSimulationRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "project_id": {
+                    "type": "string"
+                },
+                "schema_data": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "simulation_settings": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "Basic Electronics",
+                        "IoT",
+                        "Power Electronics",
+                        "Wireless",
+                        "Renewable Energy",
+                        "Audio",
+                        "Digital Logic"
+                    ]
                 }
             }
         },
@@ -5905,6 +7855,29 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.GetProgressResponse": {
+            "type": "object",
+            "properties": {
+                "breakdown": {
+                    "$ref": "#/definitions/dto.ProgressBreakdown"
+                },
+                "milestones": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.MilestoneInfo"
+                    }
+                },
+                "next_action": {
+                    "type": "string"
+                },
+                "progress": {
+                    "type": "integer"
+                },
+                "total_xp_earned": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.HardwareConfig": {
             "type": "object",
             "properties": {
@@ -6098,6 +8071,20 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.LevelUpInfo": {
+            "type": "object",
+            "properties": {
+                "new_level": {
+                    "type": "integer"
+                },
+                "old_level": {
+                    "type": "integer"
+                },
+                "xp_to_next": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.LoginRequest": {
             "type": "object",
             "required": [
@@ -6110,6 +8097,23 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.MilestoneInfo": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "unlocked_at": {
+                    "type": "string"
+                },
+                "xp_earned": {
+                    "type": "integer"
                 }
             }
         },
@@ -6209,6 +8213,34 @@ const docTemplate = `{
                 },
                 "start": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.ProgressBreakdown": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/dto.ComponentProgress"
+                },
+                "schema": {
+                    "$ref": "#/definitions/dto.ComponentProgress"
+                },
+                "simulation": {
+                    "$ref": "#/definitions/dto.ComponentProgress"
+                },
+                "verification": {
+                    "$ref": "#/definitions/dto.ComponentProgress"
+                }
+            }
+        },
+        "dto.ProgressUpdateInfo": {
+            "type": "object",
+            "properties": {
+                "new": {
+                    "type": "integer"
+                },
+                "old": {
+                    "type": "integer"
                 }
             }
         },
@@ -6374,6 +8406,38 @@ const docTemplate = `{
                 },
                 "xp_reward": {
                     "type": "integer"
+                }
+            }
+        },
+        "dto.ProjectProgressUpdateRequest": {
+            "type": "object",
+            "required": [
+                "action",
+                "component"
+            ],
+            "properties": {
+                "action": {
+                    "type": "string",
+                    "enum": [
+                        "save",
+                        "run",
+                        "verify"
+                    ]
+                },
+                "component": {
+                    "type": "string",
+                    "enum": [
+                        "schema",
+                        "code",
+                        "simulation",
+                        "verification"
+                    ]
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },
@@ -6604,6 +8668,207 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.RunSimulationRequest": {
+            "type": "object",
+            "properties": {
+                "duration_ms": {
+                    "type": "integer",
+                    "maximum": 60000,
+                    "minimum": 100
+                },
+                "speed_multiplier": {
+                    "type": "number",
+                    "maximum": 10,
+                    "minimum": 0.1
+                }
+            }
+        },
+        "dto.RunSimulationRequestDTO": {
+            "type": "object",
+            "properties": {
+                "duration_ms": {
+                    "type": "integer",
+                    "maximum": 300000,
+                    "minimum": 100
+                },
+                "settings_override": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "dto.RunSimulationResponse": {
+            "type": "object",
+            "properties": {
+                "progress_update": {
+                    "$ref": "#/definitions/dto.ProgressUpdateInfo"
+                },
+                "results": {
+                    "$ref": "#/definitions/dto.SimulationResults"
+                },
+                "simulation_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "description": "success, failed, timeout",
+                    "type": "string"
+                },
+                "xp_earned": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.RunSimulationResponseDTO": {
+            "type": "object",
+            "properties": {
+                "run_id": {
+                    "type": "string"
+                },
+                "started_at": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SaveCodeRequest": {
+            "type": "object",
+            "required": [
+                "content",
+                "language"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "filename": {
+                    "type": "string"
+                },
+                "language": {
+                    "type": "string",
+                    "enum": [
+                        "arduino",
+                        "micropython",
+                        "c",
+                        "cpp",
+                        "python"
+                    ]
+                }
+            }
+        },
+        "dto.SaveCodeResponse": {
+            "type": "object",
+            "properties": {
+                "char_count": {
+                    "type": "integer"
+                },
+                "is_first_save": {
+                    "type": "boolean"
+                },
+                "progress": {
+                    "type": "integer"
+                },
+                "progress_change": {
+                    "type": "integer"
+                },
+                "success": {
+                    "type": "boolean"
+                },
+                "xp_earned": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.SaveSchemaRequest": {
+            "type": "object",
+            "required": [
+                "components"
+            ],
+            "properties": {
+                "canvas_settings": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "components": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "connections": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "dto.SaveSchemaResponse": {
+            "type": "object",
+            "properties": {
+                "is_first_save": {
+                    "type": "boolean"
+                },
+                "progress": {
+                    "type": "integer"
+                },
+                "progress_change": {
+                    "type": "integer"
+                },
+                "success": {
+                    "type": "boolean"
+                },
+                "xp_earned": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.SaveSimulationResultRequest": {
+            "type": "object",
+            "required": [
+                "duration_ms",
+                "result_data"
+            ],
+            "properties": {
+                "duration_ms": {
+                    "type": "integer"
+                },
+                "errors": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "result_data": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "warnings": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "dto.SaveSimulationResultResponse": {
+            "type": "object",
+            "properties": {
+                "run_id": {
+                    "type": "string"
+                },
+                "xp_earned": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.SensorDataResponse": {
             "type": "object",
             "properties": {
@@ -6658,6 +8923,135 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.SimulationDetailResponse": {
+            "type": "object",
+            "properties": {
+                "components_count": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "error_message": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "last_result": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "last_run_at": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "project_id": {
+                    "type": "string"
+                },
+                "project_name": {
+                    "type": "string"
+                },
+                "run_count": {
+                    "type": "integer"
+                },
+                "schema_data": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "simulation_settings": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "status": {
+                    "type": "string"
+                },
+                "thumbnail_url": {
+                    "type": "string"
+                },
+                "total_runtime_ms": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "wires_count": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.SimulationResults": {
+            "type": "object",
+            "properties": {
+                "errors": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "output_data": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "warnings": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "dto.SimulationStatsResponse": {
+            "type": "object",
+            "properties": {
+                "by_type": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer"
+                    }
+                },
+                "completed": {
+                    "type": "integer"
+                },
+                "error": {
+                    "type": "integer"
+                },
+                "paused": {
+                    "type": "integer"
+                },
+                "running_now": {
+                    "type": "integer"
+                },
+                "simulations_this_week": {
+                    "type": "integer"
+                },
+                "success_rate": {
+                    "type": "number"
+                },
+                "total_runtime_hours": {
+                    "type": "number"
+                },
+                "total_simulations": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.StartSessionResponse": {
             "type": "object",
             "properties": {
@@ -6677,6 +9071,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "session_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.StopSimulationResponse": {
+            "type": "object",
+            "properties": {
+                "duration_ms": {
+                    "type": "integer"
+                },
+                "status": {
                     "type": "string"
                 }
             }
@@ -6797,6 +9202,27 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.UpdateCircuitRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "is_public": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "schema_data": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
         "dto.UpdateProgressRequest": {
             "type": "object",
             "properties": {
@@ -6812,6 +9238,67 @@ const docTemplate = `{
                 "time_spent_minutes": {
                     "type": "integer",
                     "minimum": 0
+                }
+            }
+        },
+        "dto.UpdateProgressResponse": {
+            "type": "object",
+            "properties": {
+                "breakdown": {
+                    "$ref": "#/definitions/dto.ProgressBreakdown"
+                },
+                "milestones_unlocked": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "progress": {
+                    "type": "integer"
+                },
+                "progress_change": {
+                    "type": "integer"
+                },
+                "xp_earned": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.UpdateSimulationRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "schema_data": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "simulation_settings": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UseTemplateRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "project_id": {
+                    "type": "string"
                 }
             }
         },

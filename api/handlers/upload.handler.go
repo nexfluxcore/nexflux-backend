@@ -101,6 +101,12 @@ func (h *UploadHandler) Upload(c *gin.Context) {
 	// Generate prefix (user ID + optional context)
 	prefix := userID.(string)
 
+	// Check if storage is initialized
+	if storage.DefaultCloudStorage == nil {
+		utils.RespondWithError(c, http.StatusServiceUnavailable, "Storage service not available. Please check server configuration.")
+		return
+	}
+
 	// Upload to storage
 	url, err := storage.DefaultCloudStorage.UploadFile(bucket, file, prefix)
 	if err != nil {
@@ -166,6 +172,12 @@ func (h *UploadHandler) UploadMultiple(c *gin.Context) {
 	bucket := getBucketForType(uploadType)
 	prefix := userID.(string)
 	maxSize := getMaxSizeForType(uploadType)
+
+	// Check if storage is initialized
+	if storage.DefaultCloudStorage == nil {
+		utils.RespondWithError(c, http.StatusServiceUnavailable, "Storage service not available")
+		return
+	}
 
 	var results []UploadResponse
 	var errors []string
@@ -233,6 +245,12 @@ func (h *UploadHandler) DeleteFile(c *gin.Context) {
 	fileURL := c.Query("url")
 	if fileURL == "" {
 		utils.RespondWithError(c, http.StatusBadRequest, "URL is required")
+		return
+	}
+
+	// Check if storage is initialized
+	if storage.DefaultCloudStorage == nil {
+		utils.RespondWithError(c, http.StatusServiceUnavailable, "Storage service not available")
 		return
 	}
 

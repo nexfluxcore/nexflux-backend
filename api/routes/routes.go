@@ -27,6 +27,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 	labWSHandler := handlers.NewLabWSHandler(db)
 	circuitHandler := handlers.NewCircuitHandler(db)       // Circuit Simulator
 	simulationHandler := handlers.NewSimulationHandler(db) // Simulation Management
+	securityHandler := handlers.NewSecurityHandler(db)     // Security Settings
 
 	// Apply CORS middleware globally
 	router.Use(middleware.CORSMiddleware())
@@ -109,9 +110,27 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB) {
 		authProtected := apiV1.Group("/auth")
 		authProtected.Use(middleware.JWTAuthMiddleware())
 		{
-			auth.PUT("/change-password", authHandler.ChangePassword)
-			auth.POST("/logout", authHandler.Logout)
-			auth.GET("/me", authHandler.GetMe)
+			authProtected.PUT("/change-password", authHandler.ChangePassword)
+			authProtected.POST("/logout", authHandler.Logout)
+			authProtected.GET("/me", authHandler.GetMe)
+
+			// Security Settings
+			authProtected.GET("/security", securityHandler.GetSecuritySettings)
+			authProtected.PUT("/password", securityHandler.ChangePassword)
+
+			// Two-Factor Authentication
+			authProtected.GET("/2fa/status", securityHandler.Get2FAStatus)
+			authProtected.POST("/2fa/enable", securityHandler.Enable2FA)
+			authProtected.POST("/2fa/verify", securityHandler.Verify2FA)
+			authProtected.POST("/2fa/disable", securityHandler.Disable2FA)
+
+			// Session Management
+			authProtected.GET("/sessions", securityHandler.GetSessions)
+			authProtected.DELETE("/sessions", securityHandler.RevokeAllSessions)
+			authProtected.DELETE("/sessions/:id", securityHandler.RevokeSession)
+
+			// Login History
+			authProtected.GET("/login-history", securityHandler.GetLoginHistory)
 		}
 
 		// ========================================

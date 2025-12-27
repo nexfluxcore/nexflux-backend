@@ -563,6 +563,16 @@ definitions:
       xp_multiplier:
         type: number
     type: object
+  dto.Disable2FARequest:
+    properties:
+      code:
+        type: string
+      password:
+        type: string
+    required:
+    - code
+    - password
+    type: object
   dto.DocArticleBriefResponse:
     properties:
       author:
@@ -753,6 +763,17 @@ definitions:
         type: string
       views:
         type: integer
+    type: object
+  dto.Enable2FAResponse:
+    properties:
+      backup_codes:
+        items:
+          type: string
+        type: array
+      qr_code_url:
+        type: string
+      secret:
+        type: string
     type: object
   dto.EndSessionRequest:
     properties:
@@ -1457,6 +1478,27 @@ definitions:
       xp_earned:
         type: integer
     type: object
+  dto.SecuritySettingsResponse:
+    properties:
+      account_locked:
+        type: boolean
+      active_sessions_count:
+        type: integer
+      last_login_at:
+        type: string
+      last_login_ip:
+        type: string
+      last_login_location:
+        type: string
+      locked_until:
+        type: string
+      password_changed_at:
+        type: string
+      recent_login_attempts:
+        type: integer
+      two_factor_enabled:
+        type: boolean
+    type: object
   dto.SensorDataResponse:
     properties:
       sensors:
@@ -1676,6 +1718,15 @@ definitions:
       status:
         type: string
     type: object
+  dto.TwoFAStatusResponse:
+    properties:
+      backup_codes_remaining:
+        type: integer
+      enabled:
+        type: boolean
+      enabled_at:
+        type: string
+    type: object
   dto.UpdateCircuitRequest:
     properties:
       description:
@@ -1891,6 +1942,13 @@ definitions:
       username:
         maxLength: 50
         type: string
+    type: object
+  dto.Verify2FARequest:
+    properties:
+      code:
+        type: string
+    required:
+    - code
     type: object
   handlers.HealthResponse:
     properties:
@@ -2112,6 +2170,104 @@ paths:
       summary: Handle OAuth callback via POST
       tags:
       - Auth
+  /auth/2fa/disable:
+    post:
+      consumes:
+      - application/json
+      description: Disable two-factor authentication
+      parameters:
+      - description: Password and code
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Disable2FARequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 2FA disabled
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid code or password
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Disable 2FA
+      tags:
+      - Security
+  /auth/2fa/enable:
+    post:
+      description: Enable two-factor authentication
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 2FA enabled
+          schema:
+            $ref: '#/definitions/dto.Enable2FAResponse'
+        "400":
+          description: Already enabled
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Enable 2FA
+      tags:
+      - Security
+  /auth/2fa/status:
+    get:
+      description: Check 2FA status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 2FA status
+          schema:
+            $ref: '#/definitions/dto.TwoFAStatusResponse'
+      security:
+      - Bearer: []
+      summary: Get 2FA status
+      tags:
+      - Security
+  /auth/2fa/verify:
+    post:
+      consumes:
+      - application/json
+      description: Verify 2FA code during setup
+      parameters:
+      - description: Verification code
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Verify2FARequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 2FA verified
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid code
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Verify 2FA
+      tags:
+      - Security
   /auth/change-password:
     put:
       consumes:
@@ -2206,6 +2362,33 @@ paths:
       summary: Login with email and password
       tags:
       - Auth
+  /auth/login-history:
+    get:
+      description: Get recent login attempts
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login history
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get login history
+      tags:
+      - Security
   /auth/logout:
     post:
       description: Invalidate user's tokens
@@ -2247,6 +2430,49 @@ paths:
       summary: Get current user
       tags:
       - Auth
+  /auth/password:
+    put:
+      consumes:
+      - application/json
+      description: Change user's password
+      parameters:
+      - description: Password change request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Password changed
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Current password incorrect
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "422":
+          description: Same password
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Change password
+      tags:
+      - Security
   /auth/providers:
     get:
       description: Returns list of OAuth providers that are configured and available
@@ -2361,6 +2587,76 @@ paths:
       summary: Reset password
       tags:
       - Auth
+  /auth/security:
+    get:
+      description: Get overall security settings for the user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Security settings
+          schema:
+            $ref: '#/definitions/dto.SecuritySettingsResponse'
+      security:
+      - Bearer: []
+      summary: Get security settings
+      tags:
+      - Security
+  /auth/sessions:
+    delete:
+      description: Revoke all sessions except current
+      responses:
+        "200":
+          description: Sessions revoked
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Revoke all sessions
+      tags:
+      - Security
+    get:
+      description: Get all active sessions for the user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Active sessions
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get active sessions
+      tags:
+      - Security
+  /auth/sessions/{id}:
+    delete:
+      description: Revoke a specific session
+      parameters:
+      - description: Session ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Session revoked
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Cannot revoke current session
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Revoke session
+      tags:
+      - Security
   /auth/verify-reset-token:
     get:
       description: Check if a password reset token is valid

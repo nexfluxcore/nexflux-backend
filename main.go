@@ -53,9 +53,13 @@ func main() {
 	// Initialize cloud storage (MinIO or local)
 	if err := storage.InitCloudStorage(); err != nil {
 		log.Printf("Warning: Failed to initialize cloud storage: %v", err)
-		// Fallback to old local storage
-		if err := storage.InitStorage(); err != nil {
-			log.Printf("Warning: Failed to initialize local storage: %v", err)
+		// Fallback: force local storage
+		log.Println("Fallback: Initializing local storage...")
+		os.Setenv("STORAGE_TYPE", "local") // Force local storage
+		if err := storage.InitCloudStorage(); err != nil {
+			log.Printf("Warning: Failed to initialize fallback local storage: %v", err)
+		} else {
+			log.Println("✅ Fallback local storage initialized")
 		}
 	}
 

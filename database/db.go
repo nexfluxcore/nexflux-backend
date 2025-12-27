@@ -175,6 +175,15 @@ func RunMigrations() {
 				&models.SimulationRun{},
 			},
 		},
+		{
+			Name: "Security Features",
+			Models: []interface{}{
+				&models.LoginHistory{},
+				&models.User2FA{},
+				&models.PasswordHistory{},
+				&models.SecurityLog{},
+			},
+		},
 	}
 
 	for _, migration := range migrations {

@@ -77,12 +77,32 @@ func InitRabbitMQ() error {
 	var initErr error
 	once.Do(func() {
 		config := GetConfig()
-		url := fmt.Sprintf("amqp://%s:%s@%s:%s/%s",
-			config.User, config.Password, config.Host, config.Port, config.VHost)
+
+		// Check if full URL is provided
+		var url string
+		if envURL := os.Getenv("RABBITMQ_URL"); envURL != "" {
+			url = envURL
+			log.Printf("📡 Using RABBITMQ_URL from environment")
+		} else {
+			// Build URL from components
+			// VHost "/" needs to be URL-encoded as "%2F"
+			vhost := config.VHost
+			if vhost == "/" {
+				vhost = "" // Empty vhost in URL means default "/"
+			} else if vhost != "" && vhost[0] != '/' {
+				// URL encode the vhost if it's not already
+				vhost = "/" + vhost
+			}
+
+			url = fmt.Sprintf("amqp://%s:%s@%s:%s%s",
+				config.User, config.Password, config.Host, config.Port, vhost)
+		}
+
+		log.Printf("📡 Connecting to RabbitMQ at %s:%s...", config.Host, config.Port)
 
 		var err error
 		conn, err = amqp.DialConfig(url, amqp.Config{
-			Dial: amqp.DefaultDial(5 * time.Second),
+			Dial: amqp.DefaultDial(10 * time.Second), // Increased timeout
 		})
 		if err != nil {
 			initErr = fmt.Errorf("failed to connect to RabbitMQ: %v", err)

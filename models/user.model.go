@@ -51,6 +51,12 @@ type User struct {
 	CreatedAt     time.Time  `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt     time.Time  `gorm:"autoUpdateTime" json:"updated_at"`
 
+	// Security fields
+	PasswordChangedAt   *time.Time `json:"password_changed_at,omitempty"`
+	FailedLoginAttempts int        `gorm:"default:0" json:"-"`
+	LockedUntil         *time.Time `json:"locked_until,omitempty"`
+	TwoFactorEnabled    bool       `gorm:"default:false" json:"two_factor_enabled"`
+
 	// Relations
 	Settings     *UserSettings     `gorm:"foreignKey:UserID" json:"settings,omitempty"`
 	Sessions     []UserSession     `gorm:"foreignKey:UserID" json:"sessions,omitempty"`
@@ -83,13 +89,17 @@ func (UserSettings) TableName() string {
 
 // UserSession represents active user sessions
 type UserSession struct {
-	ID         string    `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()" json:"id"`
-	UserID     string    `gorm:"type:uuid;index;not null" json:"user_id"`
-	Token      string    `gorm:"size:500;not null" json:"-"`
-	DeviceInfo string    `gorm:"size:255" json:"device_info"`
-	IPAddress  string    `gorm:"size:45" json:"ip_address"`
-	ExpiresAt  time.Time `gorm:"not null" json:"expires_at"`
-	CreatedAt  time.Time `gorm:"autoCreateTime" json:"created_at"`
+	ID           string    `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()" json:"id"`
+	UserID       string    `gorm:"type:uuid;index;not null" json:"user_id"`
+	TokenHash    string    `gorm:"size:255;not null" json:"-"` // Hashed token
+	Device       string    `gorm:"size:100" json:"device"`
+	Browser      string    `gorm:"size:100" json:"browser"`
+	IPAddress    string    `gorm:"size:45" json:"ip_address"`
+	Location     string    `gorm:"size:200" json:"location"`
+	UserAgent    string    `gorm:"type:text" json:"-"`
+	LastActiveAt time.Time `gorm:"default:now()" json:"last_active"`
+	ExpiresAt    time.Time `gorm:"not null" json:"expires_at"`
+	CreatedAt    time.Time `gorm:"autoCreateTime" json:"created_at"`
 
 	User *User `gorm:"foreignKey:UserID" json:"-"`
 }

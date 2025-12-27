@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/livekit/protocol/auth"
@@ -15,7 +16,8 @@ import (
 var (
 	apiKey    string
 	apiSecret string
-	host      string
+	host      string // WebSocket URL for clients
+	httpHost  string // HTTP URL for Room Service API
 	roomSvc   *lksdk.RoomServiceClient
 )
 
@@ -29,7 +31,7 @@ type Config struct {
 // GetConfig returns LiveKit configuration from environment
 func GetConfig() Config {
 	return Config{
-		URL:       getEnv("LIVEKIT_URL", "wss://livekit.nexflux.io"),
+		URL:       getEnv("LIVEKIT_URL", "ws://localhost:7880"),
 		APIKey:    os.Getenv("LIVEKIT_API_KEY"),
 		APISecret: os.Getenv("LIVEKIT_API_SECRET"),
 	}
@@ -42,6 +44,17 @@ func getEnv(key, defaultValue string) string {
 	return defaultValue
 }
 
+// convertToHTTPURL converts WebSocket URL to HTTP URL for Room Service API
+func convertToHTTPURL(wsURL string) string {
+	// Room Service API uses HTTP, not WebSocket
+	// wss:// -> https://
+	// ws:// -> http://
+	url := wsURL
+	url = strings.Replace(url, "wss://", "https://", 1)
+	url = strings.Replace(url, "ws://", "http://", 1)
+	return url
+}
+
 // InitLiveKit initializes the LiveKit client
 func InitLiveKit() error {
 	config := GetConfig()
@@ -52,12 +65,18 @@ func InitLiveKit() error {
 
 	apiKey = config.APIKey
 	apiSecret = config.APISecret
-	host = config.URL
+	host = config.URL                       // Original URL for client connections (WebSocket)
+	httpHost = convertToHTTPURL(config.URL) // HTTP URL for Room Service API
 
-	// Initialize room service client
-	roomSvc = lksdk.NewRoomServiceClient(host, apiKey, apiSecret)
+	log.Printf("📡 LiveKit Config:")
+	log.Printf("   - Client URL (WebSocket): %s", host)
+	log.Printf("   - API URL (HTTP): %s", httpHost)
+	log.Printf("   - API Key: %s", apiKey)
 
-	log.Printf("✅ LiveKit client initialized with host: %s", host)
+	// Initialize room service client with HTTP URL
+	roomSvc = lksdk.NewRoomServiceClient(httpHost, apiKey, apiSecret)
+
+	log.Printf("✅ LiveKit client initialized")
 	return nil
 }
 
